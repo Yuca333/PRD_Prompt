@@ -1,0 +1,700 @@
+meta:
+  title: v4.0 Complete - Site to PRD to Lovable to Data
+  description: Analyzes site, generates PRD and Lovable prompt, auto-deploys
+  category: User
+
+steps:
+  - type: say
+    message: Starting v4.0 automation
+
+  - type: ask
+    param: siteUrl
+    message: Enter site URL
+    default: ''
+
+  - type: say
+    message: Opening Gemini
+
+  - type: navigate
+    url: https://gemini.google.com/
+    waitForIdle: true
+
+  - type: wait
+    timeout: 8000
+    for: idle
+
+  - type: say
+    message: Prompt 1 - Business Intelligence
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: js
+    code: |
+      const url = args.siteUrl;
+      const prompt = 'You are a senior business intelligence analyst specializing in comprehensive website analysis for premium redesign projects. TARGET WEBSITE: ' + url + ' MISSION: Extract COMPLETE website intelligence to enable world-class redesign. This is a paid client engagement - extract everything needed to preserve their business voice and competitive positioning. EXTRACTION PROTOCOL: Browse ALL major pages systematically (Homepage, Services, About, Contact, Testimonials, Pricing). BUSINESS INTELLIGENCE: 1. Business Identity - Official name, tagline, industry sector (specific), years in business, geographic service areas. 2. Services/Offerings (CRITICAL) - For EACH service: name, complete description word-for-word, benefits, pricing if stated, target customers. 3. Value Propositions - Why choose this business, what makes them unique, competitive advantages, problems they solve. 4. Target Audience - Ideal customers, demographics, pain points addressed. COMPLETE CONTENT EXTRACTION (exact text, do not summarize): 1. Homepage - Hero headline exact text, subheadline exact text, main CTA, every section heading and body text. 2. About/Company - Complete story word-for-word, mission, founder info, team bios complete text, achievements. 3. Testimonials - Complete customer quotes exact words, names, titles, locations. 4. Credentials - All certifications, licenses, awards, memberships, years experience. 5. Contact Info - Phone, email, physical address, business hours complete schedule, service areas, social media. VISUAL ASSETS: Extract 2-6 most important image URLs (hero image, logo, key service images, team photo). Note primary brand colors if identifiable, overall visual style. CURRENT WEBSITE ASSESSMENT: Identify 4-5 CRITICAL issues with specific examples (outdated design, poor mobile, unclear navigation, weak CTAs, unprofessional layout). BRAND VOICE ANALYSIS: Tone (professional/casual/technical), writing style, language level, key phrases used, overall personality. OUTPUT FORMAT: Present as WEBSITE INTELLIGENCE EXTRACTION REPORT with TARGET WEBSITE, EXTRACTION DATE, then all sections. Include EXTRACTION COMPLETENESS ASSESSMENT with content coverage, gaps identified, confidence level. CRITICAL: Extract complete text, do NOT summarize. Preserve exact wording. Include ALL services with full descriptions. Capture authentic brand voice.';
+      
+      let input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+      if (!input) input = document.querySelector('[contenteditable="true"]');
+      if (!input) return { error: 'No input' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      
+      if (input.tagName === 'TEXTAREA') {
+        input.value = prompt;
+      } else {
+        input.textContent = prompt;
+      }
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return { success: true };
+    args: siteUrl
+    param: paste1
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1500));
+      const btn = document.querySelector('button[aria-label="Send message"]');
+      if (btn && !btn.disabled) {
+        btn.click();
+        return { success: true };
+      }
+      return { error: 'No button' };
+    param: submit1
+
+  - type: say
+    message: Waiting for response 1
+
+  - type: wait
+    timeout: 5000
+    for: idle
+
+  - type: js
+    code: |
+      const maxWait = 600;
+      const check = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, check * 1000));
+        waited += check;
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: wait1
+
+  - type: say
+    message: Response 1 complete
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1000));
+      return window.location.href;
+    param: finalChatUrl
+
+  - type: wait
+    timeout: 3000
+    for: idle
+
+  - type: say
+    message: Prompt 2 - PRD
+
+  - type: js
+    code: |
+      const prompt = 'You are a senior web strategist and design consultant specializing in award-winning website redesigns for small businesses. MISSION: Review the Website Intelligence Extraction Report you just created, fill any critical gaps, then research and specify award-winning design direction. PHASE 1 GAP ANALYSIS (20 percent): Review extraction for missing info: Complete service descriptions, pricing, full contact info, company background, team bios, credentials, testimonials, geographic coverage. IF GAPS EXIST: Return to original website and extract missing information. Document as ADDITIONAL EXTRACTION with category, complete text, source page. PHASE 2 AWARD-WINNING DESIGN RESEARCH (80 percent): PRIMARY FOCUS: Visual excellence and stunning UX. NOT priorities: SEO, performance, accessibility. Search for best-in-class design: best industry website design 2024, award winning industry websites, industry design inspiration, luxury industry web design, premium small business design. ANALYZE 5-8 EXEMPLARY WEBSITES documenting: 1. Visual Design Excellence - Layout grid system white space, color palette contrast, typography hierarchy, photography style, visual mood. 2. Stunning UI Elements - Hero composition CTA placement, card designs shadows hover, button styles micro-interactions, navigation patterns, form design, section transitions. 3. Premium UX - Service presentation, trust signal integration, social proof display, contact CTA strategy, content organization. 4. Interactive Dynamic - Scroll animations, hover states, image treatments parallax, video integration, transitions. 5. Mobile Patterns - Touch-friendly navigation, content prioritization, mobile interactions. OUTPUT DESIGN BENCHMARK RESEARCH with industry, exemplary websites analyzed, key design patterns for visual layout color typography imagery, UX navigation content CTAs trust, mobile standards, conversion practices. DESIGN DIRECTION SPECIFICATIONS: 1. Visual Aesthetic - Overall mood, design philosophy, visual personality. 2. Color Strategy - Primary Secondary Accent colors with hex codes and rationale for premium feel. 3. Typography System - Heading font Body font with pairing rationale, size scale, weight variations. 4. Layout Spacing - Grid system, white space philosophy, section spacing, content width, mobile adaptation. 5. Photography Imagery - Hero style, treatment, overlays, service images, team photos. 6. UI Components - Buttons Primary Secondary Ghost specs, Cards service testimonial team treatment, Forms input labels submit, Navigation desktop mobile. 7. Interactive Elements - Micro-interactions, scroll animations, transitions, loading states. 8. Homepage Architecture - Hero Section composition impact CTA, Services layout visual interaction, Trust testimonial credential authority, Contact prominence form options. 9. Mobile Priorities - Touch targets thumb-friendly content navigation fast. 10. Design Differentiation - Unique visual elements standing out. DESIGN CONFIDENCE ASSESSMENT with visual impact rating, design modernity, brand fit, implementation feasibility. Combine Gap Analysis and Design Research into comprehensive deliverable.';
+      
+      let input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+      if (!input) input = document.querySelector('[contenteditable="true"]');
+      if (!input) return { error: 'No input' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      
+      if (input.tagName === 'TEXTAREA') {
+        input.value = prompt;
+      } else {
+        input.textContent = prompt;
+      }
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return { success: true };
+    param: paste2
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1500));
+      const btn = document.querySelector('button[aria-label="Send message"]');
+      if (btn && !btn.disabled) {
+        btn.click();
+        return { success: true };
+      }
+      return { error: 'No button' };
+    param: submit2
+
+  - type: say
+    message: Waiting for response 2
+
+  - type: wait
+    timeout: 5000
+    for: idle
+
+  - type: js
+    code: |
+      const maxWait = 600;
+      const check = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, check * 1000));
+        waited += check;
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: wait2
+
+  - type: say
+    message: Response 2 complete
+
+  - type: wait
+    timeout: 3000
+    for: idle
+
+  - type: say
+    message: Prompt 3 - Lovable Phase 1
+
+  - type: js
+    code: |
+      const prompt = 'Generate Phase 1 Lovable.dev prompt from the reports. CRITICAL: Output ONLY the Lovable prompt itself, no intro no explanations. First word should be opening tag or You are. FRAMEWORK: First 300 tokens critical with role definition, business context, aesthetic anchor. Optimal 1800-2500 words. Use XML tags for sections. Positive constraints only with specific measurements. SYNTHESIS: Extract from reports business name industry services audience voice images issues. From design research exemplary sites, color strategy emotional language not hex, typography fonts, layout philosophy, UI specs, trust signals. AESTHETIC ANCHOR choose one: Design Movement Mashup like Brutalism meets Scandinavian, Brand Comparison like Stripe precision with Notion warmth, or Sensory Description like sunlit cafe clean natural warm. VISUAL HIERARCHY specify Primary 60 percent Secondary 30 percent Tertiary 10 percent attention. COLOR STRATEGY emotional contextual language Base Nordic palette or Midnight blues, Accent Oxidized copper or Forest sage, Application 70 percent neutral accent for conversion, Rationale why premium for industry. CORE CONSTRAINTS 3-5 positive: White Space 80px padding asymmetric margins 60px CTA buffer. Typography Hierarchy 48-72px hero 32-40px sections 16-18px body 1.6 line-height max two fonts. Asymmetric Editorial 60/40 splits overlapping 20 percent diagonal 5-7 degrees. Restrained Color max 3 plus black white 70 percent base accent conversion 4.5:1 contrast. Mobile-First 44x44px targets single-column 375px thumb-zone bottom third. STRUCTURE each section with purpose layout content conversion micro-interactions: Hero 300 words F-pattern 60/40 CTA strategy. Social Proof 200 words testimonials credentials trust. Features 250 words cards benefits interactions. CTA 200 words hierarchy form if applicable. Footer 100 words minimal. DESIGN EXCELLENCE 300 words: White space 8px grid, Micro-interactions scale 1.05 0.3s, Typography refinement spacing, Color 70 percent base 30 percent accent, Depth layered shadows perspective. TECHNICAL: React 18 TypeScript Tailwind v4 shadcn Auto-Form Dialog DataTable Framer Motion. Advanced backdrop-blur group-hover custom keyframes arbitrary motion-safe. Responsive 375px base sm 640px lg 1024px xl 1280px. MOBILE 200 words: 44x44px targets, thumb-zone CTAs, single-column, 16px min font, sticky CTA after 50 percent scroll. CRITICAL REMINDERS final 200 words reiterate top 3-5 constraints, AWARD-WINNING that CONVERTS, primary goal, Start building now. OUTPUT TEMPLATE: role business_context design_direction constraints technical page_structure excellence mobile reminders. Generate complete Phase 1 Lovable prompt now.';
+      
+      let input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+      if (!input) input = document.querySelector('[contenteditable="true"]');
+      if (!input) return { error: 'No input' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      
+      if (input.tagName === 'TEXTAREA') {
+        input.value = prompt;
+      } else {
+        input.textContent = prompt;
+      }
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return { success: true };
+    param: paste3
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1500));
+      const btn = document.querySelector('button[aria-label="Send message"]');
+      if (btn && !btn.disabled) {
+        btn.click();
+        return { success: true };
+      }
+      return { error: 'No button' };
+    param: submit3
+
+  - type: say
+    message: Waiting for Lovable Phase 1 prompt
+
+  - type: wait
+    timeout: 5000
+    for: idle
+
+  - type: js
+    code: |
+      const maxWait = 600;
+      const check = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, check * 1000));
+        waited += check;
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: wait3
+
+  - type: say
+    message: Phase 1 prompt ready
+
+  - type: say
+    message: Extracting Phase 1 text
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 2000));
+      let msgs = Array.from(document.querySelectorAll('[data-message-author-role="model"]'));
+      if (msgs.length === 0) return '';
+      return (msgs[msgs.length - 1].innerText || msgs[msgs.length - 1].textContent || '').trim();
+    param: phase1Prompt
+
+  - type: say
+    message: Phase 1 stored
+
+  - type: wait
+    timeout: 3000
+    for: idle
+
+  - type: say
+    message: Prompt 4 - Phase 2 Enhancement
+
+  - type: wait
+    timeout: 3000
+    for: idle
+
+  - type: js
+    code: |
+      const prompt = 'Generate Phase 2 enhancement prompt for Lovable. CRITICAL: Output ONLY the prompt, no intro. First word Enhance. PHASE 2 FOCUS: NOT structure or content, page already built. ADD advanced visual refinements, sophisticated animations, premium polish, interactive elements. OPTIMAL 1200-1800 words. Front-load impactful enhancements. FRAMEWORK: First 300 tokens Enhance existing maintain structure focus visual. Positive Add X not Improve. Specific Implement parallax 0.5 speed. Exact timing 0.8s ease-out. CATEGORIES: ADVANCED ANIMATIONS 40 percent: Hero entrance headline 0.6s subhead delay 0.3s CTA 0.4s, background parallax gradient particle. Scroll Reveals stagger 0.1s delay translateY 40px to 0, scale 0.9 to 1.0, trigger 80 percent viewport useInView. Section Transitions diagonal 5-7 degrees, fade crossfade, parallax 0.3-0.7 speeds. MICRO-INTERACTIONS 30 percent: Buttons hover scale 1.05 shadow 4-12px 0.3s, active 0.95, ripple, icons slide 4px. Cards hover translateY -8px shadow, content reveal, border glow, tilt 2-3deg perspective. Forms focus border scale 1.02, label float, checkmark valid, shake error. Links underline slide 0.2s, color morph, icon rotate 5deg. VISUAL POLISH 20 percent: Glassmorphic backdrop-blur-md semi-transparent, overlays modals. Gradients animated 3-5s cycles, mesh multiple stops, text fills. Textures noise 2-3 percent opacity, patterns low opacity, organic shapes. Shadows layered multiple, accent-tinted 15 percent, elevation 2px 8px 24px states. INTERACTIVE 10 percent: Scroll progress bar top fills, section highlights. Cursor custom magnetic trail. Loading skeletons progress optimistic. TECHNICAL: Framer Motion import motion useScroll useTransform useInView, variants sequences, useInView triggers, useScroll parallax. Performance transforms only never layout, motion-safe prefix, 60fps target. Timing fast 0.2-0.3s ease, medium 0.4-0.6s ease-in-out, slow 0.8-1.2s custom, stagger 0.1s delay. OUTPUT: Enhance existing maintain structure. ADVANCED ANIMATIONS hero scroll sections. MICRO-INTERACTIONS buttons cards forms links. VISUAL POLISH glass gradients textures shadows. INTERACTIVE progress cursor loading. TECHNICAL motion performance timing. REMINDERS maintain content structure brand 60fps motion-safe. Implement now.';
+      
+      let input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+      if (!input) input = document.querySelector('[contenteditable="true"]');
+      if (!input) return { error: 'No input' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      
+      if (input.tagName === 'TEXTAREA') {
+        input.value = prompt;
+      } else {
+        input.textContent = prompt;
+      }
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return { success: true };
+    param: paste4
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1500));
+      const btn = document.querySelector('button[aria-label="Send message"]');
+      if (btn && !btn.disabled) {
+        btn.click();
+        return { success: true };
+      }
+      return { error: 'No button' };
+    param: submit4
+
+  - type: say
+    message: Waiting for Phase 2 prompt
+
+  - type: wait
+    timeout: 5000
+    for: idle
+
+  - type: js
+    code: |
+      const maxWait = 300;
+      const check = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, check * 1000));
+        waited += check;
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: wait4
+
+  - type: say
+    message: Phase 2 prompt ready
+
+  - type: say
+    message: Extracting Phase 2 text
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 2000));
+      let msgs = Array.from(document.querySelectorAll('[data-message-author-role="model"]'));
+      if (msgs.length === 0) return '';
+      return (msgs[msgs.length - 1].innerText || msgs[msgs.length - 1].textContent || '').trim();
+    param: phase2Prompt
+
+  - type: say
+    message: Phase 2 stored
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: say
+    message: Returning to Gemini
+
+  - type: navigate
+    url: https://lovable.dev
+    waitForIdle: true
+
+  - type: wait
+    timeout: 8000
+    for: idle
+
+  - type: say
+    message: Waiting for Lovable to load
+
+  - type: js
+    code: |
+      const maxWait = 30;
+      let waited = 0;
+      while (waited < maxWait) {
+        const input = document.querySelector('textarea#chatinput');
+        if (input && !input.disabled) {
+          return { ready: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, 1000));
+        waited += 1;
+      }
+      return { ready: false, timeout: true };
+    param: lovableReady
+
+  - type: say
+    message: Lovable ready - Pasting Phase 1
+
+  - type: js
+    code: |
+      const text = args.phase1Prompt;
+      console.log('Phase 1 length:', text.length);
+      
+      await new Promise(r => setTimeout(r, 2000));
+      const input = document.querySelector('textarea#chatinput');
+      if (!input) return { error: 'No input found' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 1000));
+      
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+      nativeInputValueSetter.call(input, text);
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      
+      await new Promise(r => setTimeout(r, 500));
+      
+      const currentValue = input.value;
+      console.log('Value after paste:', currentValue.substring(0, 100));
+      
+      return { success: true, length: currentValue.length, matches: currentValue === text };
+    args: phase1Prompt
+    param: lovablePaste1
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: say
+    message: Submitting Phase 1
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1000));
+      
+      const btn = document.querySelector('button#chatinput-send-message-button');
+      if (!btn) {
+        console.log('No button found');
+        return { error: 'No button' };
+      }
+      
+      if (btn.disabled) {
+        console.log('Button is disabled');
+        return { error: 'Button disabled' };
+      }
+      
+      console.log('Clicking send button');
+      btn.click();
+      
+      await new Promise(r => setTimeout(r, 1000));
+      
+      return { success: true };
+    param: lovableSubmit1
+
+  - type: say
+    message: Waiting for Phase 1 generation
+
+  - type: js
+    code: |
+      const maxWait = 600;
+      let waited = 0;
+      const checkInterval = 3;
+      
+      console.log('Starting wait for Lovable Phase 1 completion...');
+      
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
+        
+        const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
+        
+        const textarea = document.querySelector('textarea#chatinput');
+        const button = document.querySelector('button#chatinput-send-message-button');
+        
+        const textareaReady = textarea && !textarea.disabled;
+        const buttonExists = !!button;
+        const generationComplete = !!thumbsUpButton;
+        
+        if (generationComplete && textareaReady && buttonExists) {
+          console.log('Lovable Phase 1 complete at', waited, 'seconds');
+          console.log('Thumbs up button found:', generationComplete);
+          console.log('Textarea ready:', textareaReady);
+          return { finished: true, waitedSeconds: waited };
+        }
+        
+        if (waited % 15 === 0) {
+          console.log('Still generating...', waited, 'seconds elapsed');
+          console.log('Thumbs up visible:', generationComplete);
+          console.log('Textarea ready:', textareaReady);
+        }
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: lovableWait1
+
+  - type: say
+    message: Phase 1 complete
+
+  - type: wait
+    timeout: 5000
+    for: idle
+
+  - type: say
+    message: Pasting Phase 2
+
+  - type: js
+    code: |
+      const text = args.phase2Prompt;
+      console.log('Phase 2 length:', text.length);
+      
+      await new Promise(r => setTimeout(r, 2000));
+      const input = document.querySelector('textarea#chatinput');
+      if (!input) return { error: 'No input found' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 1000));
+      
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+      nativeInputValueSetter.call(input, text);
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      
+      await new Promise(r => setTimeout(r, 500));
+      
+      return { success: true, length: input.value.length };
+    args: phase2Prompt
+    param: lovablePaste2
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: say
+    message: Submitting Phase 2
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1000));
+      const btn = document.querySelector('button#chatinput-send-message-button');
+      if (!btn || btn.disabled) return { error: 'Button not ready' };
+      btn.click();
+      await new Promise(r => setTimeout(r, 1000));
+      return { success: true };
+    param: lovableSubmit2
+
+  - type: say
+    message: Waiting for Phase 2 generation
+
+  - type: js
+    code: |
+      const maxWait = 600;
+      let waited = 0;
+      const checkInterval = 3;
+      
+      console.log('Starting wait for Lovable Phase 2 completion...');
+      
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
+        
+        const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
+        const textarea = document.querySelector('textarea#chatinput');
+        const button = document.querySelector('button#chatinput-send-message-button');
+        
+        const textareaReady = textarea && !textarea.disabled;
+        const buttonExists = !!button;
+        const generationComplete = !!thumbsUpButton;
+        
+        if (generationComplete && textareaReady && buttonExists) {
+          console.log('Phase 2 complete at', waited, 'seconds');
+          return { finished: true, waitedSeconds: waited };
+        }
+        
+        if (waited % 15 === 0) {
+          console.log('Still generating Phase 2...', waited, 'seconds');
+          console.log('Thumbs up visible:', generationComplete);
+        }
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: lovableWait2
+
+  - type: say
+    message: Phase 2 complete
+
+  - type: wait
+    timeout: 3000
+    for: idle
+
+  - type: say
+    message: Extracting links
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 3000));
+      
+      const editor = window.location.href;
+      console.log('Editor URL:', editor);
+      
+      let preview = '';
+      
+      const previewSvg = document.querySelector('svg.shrink-0.h-4.w-4[viewBox="0 0 24 24"]');
+      if (previewSvg) {
+        let parent = previewSvg.parentElement;
+        let attempts = 0;
+        while (parent && attempts < 10) {
+          if (parent.tagName === 'A' && parent.href) {
+            preview = parent.href;
+            console.log('Found preview via SVG parent:', preview);
+            break;
+          }
+          parent = parent.parentElement;
+          attempts++;
+        }
+      }
+      
+      if (!preview) {
+        const allLinks = document.querySelectorAll('a[href]');
+        for (const link of allLinks) {
+          const title = link.getAttribute('title');
+          const ariaLabel = link.getAttribute('aria-label');
+          if (title && title.includes('preview') || ariaLabel && ariaLabel.includes('preview')) {
+            preview = link.href;
+            console.log('Found preview via tooltip:', preview);
+            break;
+          }
+        }
+      }
+      
+      if (!preview) {
+        const allLinks = document.querySelectorAll('a[href]');
+        for (const link of allLinks) {
+          if (link.href && /preview.*\.lovable\.app/.test(link.href)) {
+            preview = link.href;
+            console.log('Found preview via URL pattern:', preview);
+            break;
+          }
+        }
+      }
+      
+      if (!preview) {
+        const urlInput = document.querySelector('input#preview-url-bar');
+        if (urlInput && urlInput.value) {
+          const value = urlInput.value;
+          if (value.startsWith('http')) {
+            preview = value;
+          } else {
+            const baseLinkMatch = editor.match(/(https:\/\/[^\/]+)/);
+            if (baseLinkMatch) {
+              preview = value.startsWith('/') ? baseLinkMatch[1] + value : value;
+            }
+          }
+          console.log('Found preview via input field:', preview);
+        }
+      }
+      
+      if (!preview) {
+        preview = 'Preview link not found - check Lovable manually';
+        console.log('Could not find preview link');
+      }
+      
+      return { editorUrl: editor, previewUrl: preview, success: true };
+    param: lovableLinks
+
+  - type: say
+    message: Links captured
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: say
+    message: Returning to ChatGPT
+
+  - type: navigate
+    url: '{{finalChatUrl}}'
+    waitForIdle: true
+
+  - type: wait
+    timeout: 5000
+    for: idle
+
+  - type: say
+    message: Sending data collection
+
+  - type: wait
+    timeout: 2000
+    for: idle
+
+  - type: js
+    code: |
+      const editor = args.lovableLinks.editorUrl;
+      const preview = args.lovableLinks.previewUrl;
+      const prompt = 'You are completing website redesign automation. Analysis and Lovable creation complete. Extract and format key data. LOVABLE LINKS: Editor ' + editor + ' Preview ' + preview + ' TASK: Generate single TSV row with 11 columns in exact order: 1. Business name 2. Lovable Editor Link 3. Lovable Preview 4. Date Germany timezone YYYY-MM-DD HH:MM 5. Business Type concise like Zahnarzt Restaurant Schreinerei 6. Email 7. Old Site Issues 2-3 point summary 8. Old Site Examples 1-2 concrete examples 9. Old Site UI flaws visual interaction problems 10. Improvement potential high-impact opportunities 11. Benefits of improvements business outcomes. DATA SOURCES: Extract from conversation business intelligence extraction, design research, website assessment. FORMATTING: Single line fields separated by TAB, NO headers NO extra lines NO markdown around TSV, strip internal tabs newlines, max 200 chars per field, use NA only if unknown, place ONLY TSV in code block. QUALITY CHECKS: Exactly 11 fields, date Germany timezone, business type specific, examples concrete, single line only. OUTPUT: Return ONLY code block with single TSV row, no text before or after. Example structure: BusinessName TAB editor-url TAB preview-url TAB 2025-01-20 14:30 TAB Restaurant TAB email TAB issues TAB examples TAB flaws TAB improvements TAB benefits. Generate actual TSV row now using conversation data.';
+      
+      let input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
+      if (!input) input = document.querySelector('[contenteditable="true"]');
+      if (!input) return { error: 'No input' };
+      
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      
+      if (input.tagName === 'TEXTAREA') {
+        input.value = prompt;
+      } else {
+        input.textContent = prompt;
+      }
+      
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      return { success: true };
+    args: lovableLinks
+    param: dataPrompt
+
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1500));
+      const btn = document.querySelector('button[aria-label="Send message"]');
+      if (btn && !btn.disabled) {
+        btn.click();
+        return { success: true };
+      }
+      return { error: 'No button' };
+    param: dataSubmit
+
+  - type: say
+    message: AUTOMATION COMPLETE
+
+version: 1
+

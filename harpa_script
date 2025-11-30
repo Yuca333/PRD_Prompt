@@ -1,14 +1,399 @@
 meta:
-  title: v4.0 Complete - Site to PRD to Lovable to Data
+  title: v4.1 Complete - Site to PRD to Lovable to Data
   description: Analyzes site, generates PRD and Lovable prompt, auto-deploys
   category: User
 steps:
   - type: say
-    message: Starting v4.0 automation
+    message: Starting v4.1 automation
   - type: ask
     param: siteUrl
     message: Enter site URL
     default: ''
+  - type: say
+    message: Opening ChatGPT for image discovery
+  - type: navigate
+    url: https://chatgpt.com/
+    waitForIdle: true
+  - type: wait
+    timeout: 8000
+    for: idle
+  - type: say
+    message: Prompt 0 - Image Extraction
+  - type: wait
+    timeout: 2000
+    for: idle
+  - type: js
+    code: >
+      const url = args.siteUrl;
+
+      const prompt = `2 Image Task
+      ───────────────────────────────────────────────────────────────────
+
+      1. Visit the target URL given at the **end of this prompt**.
+      2. Extract 3–5 most important marketing images (Logo, Hero, Team, Product).
+      3. Output ONLY one of the two blocks below.
+
+      IMAGE INTEGRATION FOR PRD
+      ═══════════════════════════════════════════════════════════════════
+
+      <thinking_mode>
+      You MUST aggressively try to discover marketing images before concluding “no images”.
+
+      The “target URL” is the URL on the last line of this prompt. Use it for all steps below.
+
+      FETCH & RETRY STRATEGY
+
+      1. Start by fetching the page at the target URL exactly as written on the last line of this prompt.
+      2. If the target URL has no scheme, assume https:// and prepend it.
+      3. Derive HOST_ONLY as the domain part of the target URL (e.g. if the target URL is https://www.vogt-hans.de/inhalt-Dateien/image002.jpg, then HOST_ONLY is vogt-hans.de).
+      4. If the initial fetch fails for any reason (network, TLS, timeout, access, decoding error, etc.), try in this order (if different from the original):
+      • https:// + HOST_ONLY
+      • https://www. + HOST_ONLY
+      • http:// + HOST_ONLY
+      • http://www. + HOST_ONLY
+
+      Treat any successfully fetched HTML document from this domain as a candidate for parsing (home page, root, or redirected landing page).
+
+      IMAGE DISCOVERY STRATEGY (apply to each successfully fetched HTML page)
+      Use ALL of the following methods:
+      • METHOD 1 (HTML images): Scan <img>, <picture>, <source> for src, srcset, data-src.
+      • METHOD 2 (CSS backgrounds): Scan inline styles and linked stylesheets for background-image, background, or custom properties that contain image URLs.
+      • METHOD 3 (Meta images): Check <meta property="og:image">, <meta name="twitter:image">, and similar.
+      • METHOD 4 (Size/role cues): Prefer larger images, images in header/hero/slider sections, and images near main headings or marketing copy.
+
+      FILTERING & PRIORITY
+      Prioritize in this order:
+
+      1. Company logo (header/footer or clearly brand-mark).
+      2. Hero/main visual (large, above the fold, central).
+      3. Service/product images (1–2 strongest visuals).
+      4. Team/people photos (if prominent as part of marketing).
+
+      EXCLUDE:
+      • Icons smaller than ~50px, social media logos, purely decorative flourishes, menu icons, tiny bullets.
+
+      DECISION PROTOCOL (STRICT)
+      • IF you successfully identify ANY valid marketing image (logo, hero, service/product, team) using the above methods on ANY successfully loaded page from the domain →
+      → You MUST output BLOCK A.
+
+      • OTHERWISE (including ANY of the following):
+      – Only tiny icons/social logos found,
+      – Page(s) are not accessible or not parseable (network error, TLS error, encoding/decoding issues, timeout, access forbidden, unknown content type),
+      – HTML loads but no suitable marketing images can be confidently identified,
+
+      → You MUST output BLOCK B.
+
+      So BOTH:
+      • “Truly no marketing images” AND
+      • “Technical failure or inability to extract marketing images”
+
+      map to the same fallback: BLOCK B.
+
+      CRITICAL OUTPUT RULES
+      • Do NOT output “BLOCK A” or “BLOCK B” labels or any headers.
+      • Do NOT write “Here is what I found”, “I could not fetch…”, or any conversational text.
+      • Do NOT explain errors, reasons, or this decision logic.
+      • Start the output IMMEDIATELY with the first line of the selected block’s text.
+      • The output must be raw text ready for copy-pasting to another AI.
+      </thinking_mode>
+
+      IMAGE PRIORITY (Find in this order)
+      ───────────────────────────────────────────────────────────────────
+
+      1. Company logo (header/footer)
+      2. Hero/main visual (large, above fold, central)
+      3. Service/product images (1–2 key visuals)
+      4. Team/people photos (if prominent)
+
+      EXCLUDE: Icons (<50px), social logos, decorative graphics, menu images.
+
+      EXTRACTION STRATEGY (Use ALL methods)
+      ───────────────────────────────────────────────────────────────────
+      METHOD 1: Standard Image Tags (src, srcset, data-src)
+      METHOD 2: CSS Background Images (computed styles)
+      METHOD 3: Picture Elements (<source> tags)
+      METHOD 4: Meta Tags (og:image, twitter:image)
+
+      [URL Normalization: Prepend https:// if needed. Use absolute URLs. Remove params unless vital.]
+
+      ═══════════════════════════════════════════════════════════════════
+      BLOCK A: (Use if Images Found)
+      ═══════════════════════════════════════════════════════════════════
+      Integrate the following images into the design In way they would fit best for the business and the PRD.
+      Upgrade the PRD if necessary.
+
+      1. Logo: [URL] -[Brief visual description]
+      2. Hero: [URL] - [Brief visual description]
+      3. Service: [URL] - [Brief visual description]
+      etc
+
+      PRD INTEGRATION Suggestions:
+
+      HERO IMAGE STRATEGY Suggestions:
+      • Primary Image: [URL]
+      • Treatment: [e.g., "Full background at 60% opacity with slate-900 overlay"]
+      • Mobile: [e.g., "Center-crop focus on subject, no parallax"]
+
+      • Color Suggestions: Change Primary Color to [Hex/Tailwind] to match image tones.
+
+      ADDITIONAL ASSETS:
+      • Services: Use [URL] for [Specific Service Name].
+      • About/Team: Use [URL] for "About Us" section.
+      Update your Visual Design concept with these suggestions. But you make the final call for the overall Design concept based on all the information you have available
+
+      ═══════════════════════════════════════════════════════════════════
+      BLOCK B: (Use if NO Images Found OR technical extraction failed) //output it as written below
+      ═══════════════════════════════════════════════════════════════════
+      DESIGN OPTIMIZATION PROMPT
+      For AI Implementation via Lovable.dev
+      <thinking_mode>
+      Deep critical analysis required. Challenge every design choice.
+      </thinking_mode>
+      SELF-CRITIQUE
+      Rate your PRD design: [X/10]
+      If not 10/10, identify gaps:
+
+      * Visual Concept: Truly business-specific or generic rebranded?
+      * CSS Strategy: Did you specify effects lovable.dev excels at (Tailwind utilities, shadcn/ui, backdrop-blur, mesh gradients) or guess?
+      * Spatial Design: Optimized for React component architecture?
+      * Hero: Actually implementable with production quality?
+      Deep Analysis Questions:
+
+      1. Does each element serve THIS business's unique positioning?
+      2. Can lovable.dev render this at boutique-level quality?
+      3. What better approach haven't I considered?
+      LOVABLE.DEV TECHNICAL CHECK
+      Verify against capabilities:
+      ✅ Use These: Tailwind CSS utilities, shadcn/ui components, CSS gradients, backdrop-blur, box-shadow, smooth transitions, responsive breakpoints, React composition
+      ⚠️ Avoid: Complex custom animations, experimental CSS, external animation libraries
+      Output:
+
+      * Effects to keep: [List]
+      * Effects to replace: [List with stable alternatives]
+      * Missing opportunities: [Lovable-optimized patterns you didn't use]
+      REFINED DESIGN
+      Based on critique, output ONLY changed sections:
+      VISUAL CONCEPT V2:
+      [Improved concept if needed, or justify why original is optimal]
+      LOVABLE-OPTIMIZED IMPLEMENTATION:
+      * Exact Tailwind classes for key effects
+      * Specific shadcn/ui components
+      * Gradient approach (CSS mesh/linear)
+      * Mobile-first breakpoint strategy
+      HERO REDESIGN:
+      [Component structure + specific visual effect implementation lovable.dev handles flawlessly]
+
+      Final Output: Updated PRD sections with lovable.dev-specific optimizations.
+      ═══════════════════════════════════════════════════════════════════
+
+      Based on the strict DECISION PROTOCOL
+
+      output only either Block A or Block B, nothing else.
+
+      TARGET URL: ${url}
+
+      _________________________`;
+
+      console.log('Prompt:', prompt);
+
+
+      const selectors = ['textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
+
+      let input = null;
+
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el && window.getComputedStyle(el).display !== 'none') {
+          input = el;
+          console.log('Found input:', sel);
+          break;
+        }
+      }
+
+
+      if (!input) {
+        console.error('No input found');
+        return { error: 'Input not found', success: false };
+      }
+
+
+      function setReactValue(element, value) {
+        if (element.tagName === 'TEXTAREA') {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+          setter.call(element, value);
+        } else {
+          element.textContent = value;
+        }
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+
+      input.focus();
+
+      await new Promise(r => setTimeout(r, 500));
+
+
+      try {
+        const success = document.execCommand('insertText', false, prompt);
+        if (!success) {
+          console.log('execCommand failed, using setReactValue');
+          setReactValue(input, prompt);
+        }
+      } catch (e) {
+        console.log('execCommand error:', e);
+        setReactValue(input, prompt);
+      }
+
+
+      return { success: true, promptLength: prompt.length };
+    args: siteUrl
+    param: paste0
+  - type: js
+    code: >
+      await new Promise(r => setTimeout(r, 1000));
+
+
+      const buttonSelectors = [
+        'button[type="submit"]',
+        'button[aria-label*="Submit"]',
+        'button[aria-label*="Send"]'
+      ];
+
+
+      for (const sel of buttonSelectors) {
+        const buttons = Array.from(document.querySelectorAll(sel));
+        for (const btn of buttons) {
+          const style = window.getComputedStyle(btn);
+          if (style.display !== 'none' && !btn.disabled) {
+            console.log('Clicking submit button');
+            btn.click();
+            return { success: true, method: 'button' };
+          }
+        }
+      }
+
+
+      const input = document.querySelector('textarea, [contenteditable="true"], [role="textbox"]');
+
+      if (!input) return { error: 'Input lost' };
+
+
+      input.focus();
+
+
+      const form = input.closest('form');
+
+      if (form) {
+        console.log('Submitting form');
+        form.requestSubmit();
+        return { success: true, method: 'form' };
+      }
+
+
+      console.log('Using Enter key');
+
+      input.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        bubbles: true,
+        cancelable: true
+      }));
+
+
+      return { success: true, method: 'keyboard' };
+    param: submit0
+  - type: say
+    message: Waiting for response 0
+  - type: wait
+    timeout: 5000
+    for: idle
+  - type: js
+    code: |
+      const maxWait = 600;
+      const check = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const inputSelectors = ['textarea[placeholder="Ask anything..."]', 'textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
+        let input = null;
+        for (const sel of inputSelectors) {
+          input = document.querySelector(sel);
+          if (input) break;
+        }
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, check * 1000));
+        waited += check;
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: wait0
+  - type: say
+    message: Response 0 complete
+  - type: js
+    code: |
+      // Attempt to copy ChatGPT output using the UI copy button, fallback to DOM extraction
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      // Prefer the most recent message block in the chat area
+      const messageCandidates = Array.from(
+        document.querySelectorAll('[data-message-author-role="assistant"], article')
+      ).filter((el) => window.getComputedStyle(el).display !== 'none');
+      const latestMessage = messageCandidates[messageCandidates.length - 1] || null;
+
+      // Try clicking a copy button near the latest message
+      const copyButtonSelectors = [
+        'button[aria-label*="Copy"]',
+        'button[aria-label*="copy"]',
+        'button'
+      ];
+
+      const isCopyButton = (btn) => {
+        if (!btn) return false;
+        const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+        if (aria.includes('copy')) return true;
+        const svgChild = btn.querySelector('svg[aria-label*="Copy"], svg[aria-label*="copy"]');
+        return Boolean(svgChild);
+      };
+
+      let copiedText = '';
+      let method = 'none';
+
+      if (latestMessage) {
+        for (const sel of copyButtonSelectors) {
+            const btn = (latestMessage && latestMessage.querySelector(sel)) || document.querySelector(sel);
+            if (isCopyButton(btn)) {
+            btn.click();
+            method = 'copy-button';
+            try {
+              await sleep(200);
+              copiedText = await navigator.clipboard.readText();
+            } catch (e) {
+              console.warn('Clipboard read failed, will fallback to DOM text', e);
+            }
+            break;
+          }
+        }
+      }
+
+      // Fallback: capture text directly from the latest assistant message
+      if (!copiedText && latestMessage) {
+        const textParts = [];
+        const walker = document.createTreeWalker(latestMessage, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          textParts.push(node.textContent);
+        }
+        copiedText = textParts.join(' ').trim();
+        method = method === 'copy-button' ? 'copy-button+dom-fallback' : 'dom-text';
+      }
+
+      return { copiedText, method, copiedLength: copiedText.length };
+    param: chatgptOutput
+  - type: wait
+    timeout: 3000
+    for: idle
   - type: say
     message: Opening Perplexity
   - type: navigate
@@ -17,6 +402,33 @@ steps:
   - type: wait
     timeout: 8000
     for: idle
+  - type: say
+    message: Enabling Deep Research mode
+  - type: js
+    code: |
+      const selectors = [
+        'button[aria-label*="Deep Research"]',
+        'button',
+        '[role="button"]'
+      ];
+
+      function textMatches(el) {
+        const text = el.innerText || el.textContent || '';
+        return /deep\s*research/i.test(text);
+      }
+
+      for (const sel of selectors) {
+        const candidates = Array.from(document.querySelectorAll(sel));
+        for (const btn of candidates) {
+          if (textMatches(btn) && !btn.disabled && window.getComputedStyle(btn).display !== 'none') {
+            btn.click();
+            return { toggled: true, selector: sel };
+          }
+        }
+      }
+
+      return { toggled: false };
+    param: perplexityDeepResearch
   - type: say
     message: Prompt 1 - Business Intelligence
   - type: wait
@@ -201,6 +613,49 @@ steps:
     param: wait1
   - type: say
     message: Response 1 complete
+  - type: say
+    message: Switching Perplexity to regular search
+  - type: js
+    code: |
+      const selectors = [
+        'button[aria-label*="Deep Research"]',
+        'button',
+        '[role="button"]'
+      ];
+
+      function textMatches(el) {
+        const text = (el.innerText || el.textContent || '').toLowerCase();
+        return text.includes('deep research');
+      }
+
+      function isActive(btn) {
+        const ariaPressed = btn.getAttribute('aria-pressed');
+        const dataState = btn.getAttribute('data-state');
+        const classList = Array.from(btn.classList || []);
+        const text = (btn.innerText || btn.textContent || '').toLowerCase();
+
+        return (
+          ariaPressed === 'true' ||
+          dataState === 'on' ||
+          classList.some(c => /active|on|selected/i.test(c)) ||
+          /turn off|stop|on/.test(text)
+        );
+      }
+
+      for (const sel of selectors) {
+        const candidates = Array.from(document.querySelectorAll(sel));
+        for (const btn of candidates) {
+          if (textMatches(btn) && !btn.disabled && window.getComputedStyle(btn).display !== 'none') {
+            if (isActive(btn)) {
+              btn.click();
+              return { toggledOff: true, selector: sel, reason: 'active-state' };
+            }
+          }
+        }
+      }
+
+      return { toggledOff: false, reason: 'no-active-toggle-found' };
+    param: perplexityRegularMode
   - type: js
     code: |
       await new Promise(r => setTimeout(r, 1000));
@@ -1184,6 +1639,92 @@ steps:
     message: Phase 2 complete
   - type: wait
     timeout: 3000
+    for: idle
+  - type: say
+    message: Pasting ChatGPT image prompt into Lovable
+  - type: js
+    code: |
+      const text = (args.chatgptOutput && args.chatgptOutput.copiedText) || '';
+
+      await new Promise(r => setTimeout(r, 2000));
+
+      const input = document.querySelector('textarea#chatinput');
+
+      if (!input) return { error: 'No input found' };
+
+      input.focus();
+
+      await new Promise(r => setTimeout(r, 1000));
+
+      const nativeInputValueSetter =
+        Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+
+      nativeInputValueSetter.call(input, text);
+
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+
+      await new Promise(r => setTimeout(r, 500));
+
+      return { success: Boolean(text), length: text.length };
+    args: chatgptOutput
+    param: lovablePasteChatgpt
+  - type: wait
+    timeout: 2000
+    for: idle
+  - type: say
+    message: Submitting ChatGPT image prompt
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1000));
+
+      const btn = document.querySelector('button#chatinput-send-message-button');
+
+      if (!btn || btn.disabled) return { error: 'Button not ready' };
+
+      btn.click();
+
+      await new Promise(r => setTimeout(r, 1000));
+
+      return { success: true };
+    param: lovableSubmit3
+  - type: say
+    message: Waiting for ChatGPT prompt generation
+  - type: js
+    code: |
+      const maxWait = 600;
+      let waited = 0;
+      const checkInterval = 3;
+      let generationStarted = false;
+
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
+
+        const stopBtn = document.querySelector('button[aria-label*="Stop"]');
+        const textarea = document.querySelector('textarea#chatinput');
+        const button = document.querySelector('button#chatinput-send-message-button');
+
+        const textareaReady = textarea && !textarea.disabled;
+        const buttonExists = !!button;
+        const buttonDisabled = button && button.disabled;
+
+        if (stopBtn || buttonDisabled) {
+          generationStarted = true;
+        }
+
+        if (generationStarted && !stopBtn && textareaReady && buttonExists && !buttonDisabled) {
+          return { finished: true, waitedSeconds: waited, generationStarted };
+        }
+
+        if (waited % 15 === 0) {
+          console.log('Still generating ChatGPT prompt...', waited, 'seconds');
+        }
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited, generationStarted };
+    param: lovableWait3
+  - type: wait
+    timeout: 2000
     for: idle
   - type: say
     message: Extracting links

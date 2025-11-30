@@ -331,6 +331,66 @@ steps:
     param: wait0
   - type: say
     message: Response 0 complete
+  - type: js
+    code: |
+      // Attempt to copy ChatGPT output using the UI copy button, fallback to DOM extraction
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      // Prefer the most recent message block in the chat area
+      const messageCandidates = Array.from(
+        document.querySelectorAll('[data-message-author-role="assistant"], article')
+      ).filter((el) => window.getComputedStyle(el).display !== 'none');
+      const latestMessage = messageCandidates[messageCandidates.length - 1] || null;
+
+      // Try clicking a copy button near the latest message
+      const copyButtonSelectors = [
+        'button[aria-label*="Copy"]',
+        'button[aria-label*="copy"]',
+        'button'
+      ];
+
+      const isCopyButton = (btn) => {
+        if (!btn) return false;
+        const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+        if (aria.includes('copy')) return true;
+        const svgChild = btn.querySelector('svg[aria-label*="Copy"], svg[aria-label*="copy"]');
+        return Boolean(svgChild);
+      };
+
+      let copiedText = '';
+      let method = 'none';
+
+      if (latestMessage) {
+        for (const sel of copyButtonSelectors) {
+            const btn = (latestMessage && latestMessage.querySelector(sel)) || document.querySelector(sel);
+            if (isCopyButton(btn)) {
+            btn.click();
+            method = 'copy-button';
+            try {
+              await sleep(200);
+              copiedText = await navigator.clipboard.readText();
+            } catch (e) {
+              console.warn('Clipboard read failed, will fallback to DOM text', e);
+            }
+            break;
+          }
+        }
+      }
+
+      // Fallback: capture text directly from the latest assistant message
+      if (!copiedText && latestMessage) {
+        const textParts = [];
+        const walker = document.createTreeWalker(latestMessage, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          textParts.push(node.textContent);
+        }
+        copiedText = textParts.join(' ').trim();
+        method = method === 'copy-button' ? 'copy-button+dom-fallback' : 'dom-text';
+      }
+
+      return { copiedText, method, copiedLength: copiedText.length };
+    param: chatgptOutput
   - type: wait
     timeout: 3000
     for: idle
@@ -342,6 +402,33 @@ steps:
   - type: wait
     timeout: 8000
     for: idle
+  - type: say
+    message: Enabling Deep Research mode
+  - type: js
+    code: |
+      const selectors = [
+        'button[aria-label*="Deep Research"]',
+        'button',
+        '[role="button"]'
+      ];
+
+      function textMatches(el) {
+        const text = el.innerText || el.textContent || '';
+        return /deep\s*research/i.test(text);
+      }
+
+      for (const sel of selectors) {
+        const candidates = Array.from(document.querySelectorAll(sel));
+        for (const btn of candidates) {
+          if (textMatches(btn) && !btn.disabled && window.getComputedStyle(btn).display !== 'none') {
+            btn.click();
+            return { toggled: true, selector: sel };
+          }
+        }
+      }
+
+      return { toggled: false };
+    param: perplexityDeepResearch
   - type: say
     message: Prompt 1 - Business Intelligence
   - type: wait

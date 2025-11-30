@@ -1,14 +1,399 @@
 meta:
-  title: v4.0 Complete - Site to PRD to Lovable to Data
+  title: v4.4 Complete - Site to PRD to Lovable to Data
   description: Analyzes site, generates PRD and Lovable prompt, auto-deploys
   category: User
 steps:
   - type: say
-    message: Starting v4.0 automation
+    message: Starting v4.4 automation
   - type: ask
     param: siteUrl
     message: Enter site URL
     default: ''
+  - type: say
+    message: Opening ChatGPT for image discovery
+  - type: navigate
+    url: https://chatgpt.com/
+    waitForIdle: true
+  - type: wait
+    timeout: 8000
+    for: idle
+  - type: say
+    message: Prompt 0 - Image Extraction
+  - type: wait
+    timeout: 2000
+    for: idle
+  - type: js
+    code: >
+      const url = args.siteUrl;
+
+      const prompt = `2 Image Task
+      ───────────────────────────────────────────────────────────────────
+
+      1. Visit the target URL given at the **end of this prompt**.
+      2. Extract 3–5 most important marketing images (Logo, Hero, Team, Product).
+      3. Output ONLY one of the two blocks below.
+
+      IMAGE INTEGRATION FOR PRD
+      ═══════════════════════════════════════════════════════════════════
+
+      <thinking_mode>
+      You MUST aggressively try to discover marketing images before concluding “no images”.
+
+      The “target URL” is the URL on the last line of this prompt. Use it for all steps below.
+
+      FETCH & RETRY STRATEGY
+
+      1. Start by fetching the page at the target URL exactly as written on the last line of this prompt.
+      2. If the target URL has no scheme, assume https:// and prepend it.
+      3. Derive HOST_ONLY as the domain part of the target URL (e.g. if the target URL is https://www.vogt-hans.de/inhalt-Dateien/image002.jpg, then HOST_ONLY is vogt-hans.de).
+      4. If the initial fetch fails for any reason (network, TLS, timeout, access, decoding error, etc.), try in this order (if different from the original):
+      • https:// + HOST_ONLY
+      • https://www. + HOST_ONLY
+      • http:// + HOST_ONLY
+      • http://www. + HOST_ONLY
+
+      Treat any successfully fetched HTML document from this domain as a candidate for parsing (home page, root, or redirected landing page).
+
+      IMAGE DISCOVERY STRATEGY (apply to each successfully fetched HTML page)
+      Use ALL of the following methods:
+      • METHOD 1 (HTML images): Scan <img>, <picture>, <source> for src, srcset, data-src.
+      • METHOD 2 (CSS backgrounds): Scan inline styles and linked stylesheets for background-image, background, or custom properties that contain image URLs.
+      • METHOD 3 (Meta images): Check <meta property="og:image">, <meta name="twitter:image">, and similar.
+      • METHOD 4 (Size/role cues): Prefer larger images, images in header/hero/slider sections, and images near main headings or marketing copy.
+
+      FILTERING & PRIORITY
+      Prioritize in this order:
+
+      1. Company logo (header/footer or clearly brand-mark).
+      2. Hero/main visual (large, above the fold, central).
+      3. Service/product images (1–2 strongest visuals).
+      4. Team/people photos (if prominent as part of marketing).
+
+      EXCLUDE:
+      • Icons smaller than ~50px, social media logos, purely decorative flourishes, menu icons, tiny bullets.
+
+      DECISION PROTOCOL (STRICT)
+      • IF you successfully identify ANY valid marketing image (logo, hero, service/product, team) using the above methods on ANY successfully loaded page from the domain →
+      → You MUST output BLOCK A.
+
+      • OTHERWISE (including ANY of the following):
+      – Only tiny icons/social logos found,
+      – Page(s) are not accessible or not parseable (network error, TLS error, encoding/decoding issues, timeout, access forbidden, unknown content type),
+      – HTML loads but no suitable marketing images can be confidently identified,
+
+      → You MUST output BLOCK B.
+
+      So BOTH:
+      • “Truly no marketing images” AND
+      • “Technical failure or inability to extract marketing images”
+
+      map to the same fallback: BLOCK B.
+
+      CRITICAL OUTPUT RULES
+      • Do NOT output “BLOCK A” or “BLOCK B” labels or any headers.
+      • Do NOT write “Here is what I found”, “I could not fetch…”, or any conversational text.
+      • Do NOT explain errors, reasons, or this decision logic.
+      • Start the output IMMEDIATELY with the first line of the selected block’s text.
+      • The output must be raw text ready for copy-pasting to another AI.
+      </thinking_mode>
+
+      IMAGE PRIORITY (Find in this order)
+      ───────────────────────────────────────────────────────────────────
+
+      1. Company logo (header/footer)
+      2. Hero/main visual (large, above fold, central)
+      3. Service/product images (1–2 key visuals)
+      4. Team/people photos (if prominent)
+
+      EXCLUDE: Icons (<50px), social logos, decorative graphics, menu images.
+
+      EXTRACTION STRATEGY (Use ALL methods)
+      ───────────────────────────────────────────────────────────────────
+      METHOD 1: Standard Image Tags (src, srcset, data-src)
+      METHOD 2: CSS Background Images (computed styles)
+      METHOD 3: Picture Elements (<source> tags)
+      METHOD 4: Meta Tags (og:image, twitter:image)
+
+      [URL Normalization: Prepend https:// if needed. Use absolute URLs. Remove params unless vital.]
+
+      ═══════════════════════════════════════════════════════════════════
+      BLOCK A: (Use if Images Found)
+      ═══════════════════════════════════════════════════════════════════
+      Integrate the following images into the design In way they would fit best for the business and the PRD.
+      Upgrade the PRD if necessary.
+
+      1. Logo: [URL] -[Brief visual description]
+      2. Hero: [URL] - [Brief visual description]
+      3. Service: [URL] - [Brief visual description]
+      etc
+
+      PRD INTEGRATION Suggestions:
+
+      HERO IMAGE STRATEGY Suggestions:
+      • Primary Image: [URL]
+      • Treatment: [e.g., "Full background at 60% opacity with slate-900 overlay"]
+      • Mobile: [e.g., "Center-crop focus on subject, no parallax"]
+
+      • Color Suggestions: Change Primary Color to [Hex/Tailwind] to match image tones.
+
+      ADDITIONAL ASSETS:
+      • Services: Use [URL] for [Specific Service Name].
+      • About/Team: Use [URL] for "About Us" section.
+      Update your Visual Design concept with these suggestions. But you make the final call for the overall Design concept based on all the information you have available
+
+      ═══════════════════════════════════════════════════════════════════
+      BLOCK B: (Use if NO Images Found OR technical extraction failed) //output it as written below
+      ═══════════════════════════════════════════════════════════════════
+      DESIGN OPTIMIZATION PROMPT
+      For AI Implementation via Lovable.dev
+      <thinking_mode>
+      Deep critical analysis required. Challenge every design choice.
+      </thinking_mode>
+      SELF-CRITIQUE
+      Rate your PRD design: [X/10]
+      If not 10/10, identify gaps:
+
+      * Visual Concept: Truly business-specific or generic rebranded?
+      * CSS Strategy: Did you specify effects lovable.dev excels at (Tailwind utilities, shadcn/ui, backdrop-blur, mesh gradients) or guess?
+      * Spatial Design: Optimized for React component architecture?
+      * Hero: Actually implementable with production quality?
+      Deep Analysis Questions:
+
+      1. Does each element serve THIS business's unique positioning?
+      2. Can lovable.dev render this at boutique-level quality?
+      3. What better approach haven't I considered?
+      LOVABLE.DEV TECHNICAL CHECK
+      Verify against capabilities:
+      ✅ Use These: Tailwind CSS utilities, shadcn/ui components, CSS gradients, backdrop-blur, box-shadow, smooth transitions, responsive breakpoints, React composition
+      ⚠️ Avoid: Complex custom animations, experimental CSS, external animation libraries
+      Output:
+
+      * Effects to keep: [List]
+      * Effects to replace: [List with stable alternatives]
+      * Missing opportunities: [Lovable-optimized patterns you didn't use]
+      REFINED DESIGN
+      Based on critique, output ONLY changed sections:
+      VISUAL CONCEPT V2:
+      [Improved concept if needed, or justify why original is optimal]
+      LOVABLE-OPTIMIZED IMPLEMENTATION:
+      * Exact Tailwind classes for key effects
+      * Specific shadcn/ui components
+      * Gradient approach (CSS mesh/linear)
+      * Mobile-first breakpoint strategy
+      HERO REDESIGN:
+      [Component structure + specific visual effect implementation lovable.dev handles flawlessly]
+
+      Final Output: Updated PRD sections with lovable.dev-specific optimizations.
+      ═══════════════════════════════════════════════════════════════════
+
+      Based on the strict DECISION PROTOCOL
+
+      output only either Block A or Block B, nothing else.
+
+      TARGET URL: ${url}
+
+      _________________________`;
+
+      console.log('Prompt:', prompt);
+
+
+      const selectors = ['textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
+
+      let input = null;
+
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el && window.getComputedStyle(el).display !== 'none') {
+          input = el;
+          console.log('Found input:', sel);
+          break;
+        }
+      }
+
+
+      if (!input) {
+        console.error('No input found');
+        return { error: 'Input not found', success: false };
+      }
+
+
+      function setReactValue(element, value) {
+        if (element.tagName === 'TEXTAREA') {
+          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+          setter.call(element, value);
+        } else {
+          element.textContent = value;
+        }
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+
+      input.focus();
+
+      await new Promise(r => setTimeout(r, 500));
+
+
+      try {
+        const success = document.execCommand('insertText', false, prompt);
+        if (!success) {
+          console.log('execCommand failed, using setReactValue');
+          setReactValue(input, prompt);
+        }
+      } catch (e) {
+        console.log('execCommand error:', e);
+        setReactValue(input, prompt);
+      }
+
+
+      return { success: true, promptLength: prompt.length };
+    args: siteUrl
+    param: paste0
+  - type: js
+    code: >
+      await new Promise(r => setTimeout(r, 1000));
+
+
+      const buttonSelectors = [
+        'button[type="submit"]',
+        'button[aria-label*="Submit"]',
+        'button[aria-label*="Send"]'
+      ];
+
+
+      for (const sel of buttonSelectors) {
+        const buttons = Array.from(document.querySelectorAll(sel));
+        for (const btn of buttons) {
+          const style = window.getComputedStyle(btn);
+          if (style.display !== 'none' && !btn.disabled) {
+            console.log('Clicking submit button');
+            btn.click();
+            return { success: true, method: 'button' };
+          }
+        }
+      }
+
+
+      const input = document.querySelector('textarea, [contenteditable="true"], [role="textbox"]');
+
+      if (!input) return { error: 'Input lost' };
+
+
+      input.focus();
+
+
+      const form = input.closest('form');
+
+      if (form) {
+        console.log('Submitting form');
+        form.requestSubmit();
+        return { success: true, method: 'form' };
+      }
+
+
+      console.log('Using Enter key');
+
+      input.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        bubbles: true,
+        cancelable: true
+      }));
+
+
+      return { success: true, method: 'keyboard' };
+    param: submit0
+  - type: say
+    message: Waiting for response 0
+  - type: wait
+    timeout: 5000
+    for: idle
+  - type: js
+    code: |
+      const maxWait = 600;
+      const check = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const inputSelectors = ['textarea[placeholder="Ask anything..."]', 'textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
+        let input = null;
+        for (const sel of inputSelectors) {
+          input = document.querySelector(sel);
+          if (input) break;
+        }
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+        await new Promise(r => setTimeout(r, check * 1000));
+        waited += check;
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: wait0
+  - type: say
+    message: Response 0 complete
+  - type: js
+    code: |
+      // Attempt to copy ChatGPT output using the UI copy button, fallback to DOM extraction
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      // Prefer the most recent message block in the chat area
+      const messageCandidates = Array.from(
+        document.querySelectorAll('[data-message-author-role="assistant"], article')
+      ).filter((el) => window.getComputedStyle(el).display !== 'none');
+      const latestMessage = messageCandidates[messageCandidates.length - 1] || null;
+
+      // Try clicking a copy button near the latest message
+      const copyButtonSelectors = [
+        'button[aria-label*="Copy"]',
+        'button[aria-label*="copy"]',
+        'button'
+      ];
+
+      const isCopyButton = (btn) => {
+        if (!btn) return false;
+        const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+        if (aria.includes('copy')) return true;
+        const svgChild = btn.querySelector('svg[aria-label*="Copy"], svg[aria-label*="copy"]');
+        return Boolean(svgChild);
+      };
+
+      let copiedText = '';
+      let method = 'none';
+
+      if (latestMessage) {
+        for (const sel of copyButtonSelectors) {
+            const btn = (latestMessage && latestMessage.querySelector(sel)) || document.querySelector(sel);
+            if (isCopyButton(btn)) {
+            btn.click();
+            method = 'copy-button';
+            try {
+              await sleep(200);
+              copiedText = await navigator.clipboard.readText();
+            } catch (e) {
+              console.warn('Clipboard read failed, will fallback to DOM text', e);
+            }
+            break;
+          }
+        }
+      }
+
+      // Fallback: capture text directly from the latest assistant message
+      if (!copiedText && latestMessage) {
+        const textParts = [];
+        const walker = document.createTreeWalker(latestMessage, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          textParts.push(node.textContent);
+        }
+        copiedText = textParts.join(' ').trim();
+        method = method === 'copy-button' ? 'copy-button+dom-fallback' : 'dom-text';
+      }
+
+      return { copiedText, method, copiedLength: copiedText.length };
+    param: chatgptOutput
+  - type: wait
+    timeout: 3000
+    for: idle
   - type: say
     message: Opening Perplexity
   - type: navigate
@@ -18,6 +403,33 @@ steps:
     timeout: 8000
     for: idle
   - type: say
+    message: Enabling Deep Research mode
+  - type: js
+    code: |
+      const selectors = [
+        'button[aria-label*="Deep Research"]',
+        'button',
+        '[role="button"]'
+      ];
+
+      function textMatches(el) {
+        const text = el.innerText || el.textContent || '';
+        return /deep\s*research/i.test(text);
+      }
+
+      for (const sel of selectors) {
+        const candidates = Array.from(document.querySelectorAll(sel));
+        for (const btn of candidates) {
+          if (textMatches(btn) && !btn.disabled && window.getComputedStyle(btn).display !== 'none') {
+            btn.click();
+            return { toggled: true, selector: sel };
+          }
+        }
+      }
+
+      return { toggled: false };
+    param: perplexityDeepResearch
+  - type: say
     message: Prompt 1 - Business Intelligence
   - type: wait
     timeout: 2000
@@ -26,40 +438,309 @@ steps:
     code: >
       const url = args.siteUrl;
 
-      const prompt = 'You are a senior business intelligence analyst
-      specializing in comprehensive website analysis for premium redesign
-      projects. TARGET WEBSITE: ' + url + ' MISSION: Extract COMPLETE website
-      intelligence to enable world-class redesign. This is a paid client
-      engagement - extract everything needed to preserve their business voice
-      and competitive positioning. EXTRACTION PROTOCOL: Browse ALL major pages
-      systematically (Homepage, Services, About, Contact, Testimonials,
-      Pricing). BUSINESS INTELLIGENCE: 1. Business Identity - Official name,
-      tagline, industry sector (specific), years in business, geographic service
-      areas. 2. Services/Offerings (CRITICAL) - For EACH service: name, complete
-      description word-for-word, benefits, pricing if stated, target customers.
-      3. Value Propositions - Why choose this business, what makes them unique,
-      competitive advantages, problems they solve. 4. Target Audience - Ideal
-      customers, demographics, pain points addressed. COMPLETE CONTENT
-      EXTRACTION (exact text, do not summarize): 1. Homepage - Hero headline
-      exact text, subheadline exact text, main CTA, every section heading and
-      body text. 2. About/Company - Complete story word-for-word, mission,
-      founder info, team bios complete text, achievements. 3. Testimonials -
-      Complete customer quotes exact words, names, titles, locations. 4.
-      Credentials - All certifications, licenses, awards, memberships, years
-      experience. 5. Contact Info - Phone, email, physical address, business
-      hours complete schedule, service areas, social media. VISUAL ASSETS:
-      Extract 2-6 most important image URLs (hero image, logo, key service
-      images, team photo). Note primary brand colors if identifiable, overall
-      visual style. CURRENT WEBSITE ASSESSMENT: Identify 4-5 CRITICAL issues
-      with specific examples (outdated design, poor mobile, unclear navigation,
-      weak CTAs, unprofessional layout). BRAND VOICE ANALYSIS: Tone
-      (professional/casual/technical), writing style, language level, key
-      phrases used, overall personality. OUTPUT FORMAT: Present as WEBSITE
-      INTELLIGENCE EXTRACTION REPORT with TARGET WEBSITE, EXTRACTION DATE, then
-      all sections. Include EXTRACTION COMPLETENESS ASSESSMENT with content
-      coverage, gaps identified, confidence level. CRITICAL: Extract complete
-      text, do NOT summarize. Preserve exact wording. Include ALL services with
-      full descriptions. Capture authentic brand voice.';
+      const prompt = `1 Extraction & Intelligence Analysis
+      For Web Agency Client Redesign Projects
+
+
+      Your Role: You are a professional web analyst working for a web design agency.
+      Project Scenario: A small business owner has hired your agency to modernize their outdated website. They want to keep all their existing content, services, and business information - they just want it to look more professional and current. This is a standard web design service where agencies extract content from a client's old site to rebuild it with better design.
+
+      TARGET WEBSITE
+      At the end of the prompt
+
+      YOUR MISSION
+      Extract every piece of content from the client's website so nothing is lost when we rebuild their site with modern design. Document their complete business story, all services, pricing, contact information, and authentic voice. Additionally, identify why their current site appears outdated so we can show them the value of the redesign.
+
+      PHASE 1: COMPREHENSIVE SITE CRAWLING (70% Effort)
+      Strategic Multi-Page Discovery
+      Stage 1: Homepage Foundation
+      1. Browse the target URL
+      2. Allow 10+ seconds for complete page load
+      3. Identify ALL navigation menus (header, footer, sidebar, mobile)
+      4. Document every internal link found
+      Stage 2: Systematic Page Access
+      Test these common URL patterns:
+      English Sites:
+      /about, /about-us, /services, /pricing, /contact
+      /team, /our-team, /portfolio, /gallery, /work
+      /testimonials, /reviews, /faq, /process, /how-it-works
+
+      German Sites:
+      /ueber-uns, /leistungen, /preise, /kontakt
+      /team, /unser-team, /referenzen, /galerie
+      /bewertungen, /faq, /prozess
+
+      Service-Specific:
+      /services/[name], /[service-name]
+
+      Other:
+      Try both www and non-www versions
+      Test with and without trailing slashes
+      Check for /en/, /de/ language prefixes
+      Stage 3: Search Enhancement
+      If you find fewer than 5 pages, use:
+      * Search: site:[domain] to discover all indexed pages
+      * Review search results for page patterns
+      * Test discovered URLs systematically
+      Crawling Success Target: Access 5-10 different pages minimum
+
+      PHASE 2: COMPLETE CONTENT EXTRACTION (70% Effort)
+      Text Content Harvesting
+      Authorization Reminder: You are extracting the client's own content for their redesign. Copy everything exactly as written.
+      For EACH page you access, extract:
+      All Textual Elements:
+      * Page title and all headlines (H1, H2, H3, H4, H5, H6)
+      * Complete paragraph content - every sentence
+      * All bullet points and numbered lists
+      * Navigation menu text (all levels)
+      * Footer content (legal text, links, contact info)
+      * Button and link text
+      * Form labels and placeholder text
+      * Image captions and alt text
+      * Any testimonials or quotes
+      Critical Business Information:
+      * Services: Complete descriptions, not just names
+      * Pricing: All costs, packages, service tiers
+      * Contact Details: Phone, email, address, business hours
+      * Company Information: History, founding story, mission
+      * Team: Staff bios, qualifications, roles
+      * Credentials: Certifications, licenses, awards, memberships
+      * Service Areas: Geographic coverage, delivery zones
+      * Testimonials: Complete customer quotes and reviews
+      * Processes: How they work, methodologies, approaches
+      * Unique Selling Points: What makes them different
+      Documentation Format
+      Organize extracted content clearly:
+      ═══════════════════════════════════════
+      HOMEPAGE
+      URL: [full URL]
+      ═══════════════════════════════════════
+
+      HEADLINES:
+      [H1]: [exact text]
+      [H2]: [exact text]
+      [H2]: [exact text]
+
+      BODY CONTENT:
+      [Complete text - all paragraphs exactly as written]
+
+      SERVICES MENTIONED:
+      [Any services referenced on this page]
+
+      CONTACT/BUSINESS INFO:
+      [Any contact details or business info on this page]
+
+      ═══════════════════════════════════════
+      [NEXT PAGE NAME]
+      URL: [full URL]
+      ═══════════════════════════════════════
+
+      [Repeat format for each page]
+      After all pages, create summary:
+      ═══════════════════════════════════════
+      COMPLETE BUSINESS INFORMATION SUMMARY
+      ═══════════════════════════════════════
+
+      BUSINESS OVERVIEW:
+      Company Name: [name]
+      Industry: [type of business]
+      Primary Services: [list all services with descriptions]
+
+      PRICING STRUCTURE:
+      [All pricing information found]
+
+      CONTACT INFORMATION:
+      Phone: [number]
+      Email: [email]
+      Address: [physical address]
+      Hours: [business hours]
+      Service Areas: [geographic coverage]
+
+      COMPANY BACKGROUND:
+      [Complete company story, history, mission]
+
+      TEAM INFORMATION:
+      [All team member details found]
+
+      CREDENTIALS & CERTIFICATIONS:
+      [All licenses, certifications, awards mentioned]
+
+      CUSTOMER TESTIMONIALS:
+      [All testimonials/reviews found]
+
+      UNIQUE DIFFERENTIATORS:
+      [What makes them unique - in their words]
+      Brand Voice Analysis
+      Based on ALL extracted content, analyze:
+      BRAND VOICE & COMMUNICATION STYLE:
+
+      Tone: [Formal/Casual/Professional/Friendly - describe]
+      Writing Style: [Technical/Simple, Detailed/Concise]
+      Personality: [Key personality traits evident in writing]
+      Industry Language: [Specific terms they use for services]
+      Customer Address: [How they speak to customers - you/we/formal/informal]
+      Unique Phrases: [Any catchphrases or repeated expressions]
+      Local/Regional: [Geographic or community connections mentioned]
+
+      KEY MESSAGING THEMES:
+      - [Primary value proposition]
+      - [Main customer problems they solve]
+      - [How they differentiate from competitors]
+      - [Trust-building elements they emphasize]
+
+      PHASE 3: VISUAL ASSET EXTRACTION (10% Effort)
+      Image URL Collection
+      Extract 1-5 key images that represent the business:
+      Priority Images:
+      1. Company logo
+      2. Main hero/header image
+      3. Service images (1-2 key visuals)
+      4. Team photo (if present)
+      5. Facility/location image (if applicable)
+      Extraction Method:
+      * Right-click image → Copy Image Address
+      * Or inspect element to find <img src="[URL]">
+      * Ensure URLs are complete (start with https://)
+      * Test each URL to verify it loads
+      Documentation:
+      VISUAL ASSETS:
+
+      1. Logo
+         URL: [complete https:// URL]
+         Location: [which page it was found on]
+         Description: [what it shows]
+
+      2. Hero Image
+         URL: [complete https:// URL]
+         Location: [which page it was found on]
+         Description: [what it shows]
+
+      [Continue for each image extracted]
+
+      PHASE 4: OUTDATED DESIGN ASSESSMENT (20% Effort)
+      Current Website Issues Analysis
+      Purpose: Document why this site needs modernization to justify the redesign to the client.
+      Evaluate and document:
+      Visual Design Issues:
+      * Outdated layout (table-based design, pre-2015 aesthetics)
+      * Poor typography (system fonts, weak hierarchy, readability issues)
+      * Dated color scheme or inconsistent branding
+      * Cluttered design with poor use of white space
+      * Amateur or low-quality imagery
+      User Experience Problems:
+      * Confusing navigation structure
+      * Difficult to find important information (contact, services, pricing)
+      * Unclear calls-to-action
+      * Poor information organization
+      Mobile & Technical Issues:
+      * No responsive design or poor mobile display
+      * Slow loading speed
+      * Missing HTTPS (security warning)
+      * Broken links or outdated information
+      Professional Credibility Issues:
+      * Missing trust signals (testimonials, credentials)
+      * Outdated copyright dates or old "last updated" info
+      * No social proof or modern trust indicators
+      * Generic or stock imagery instead of authentic business photos
+      Documentation Format:
+      CURRENT WEBSITE ISSUES & REDESIGN JUSTIFICATION:
+
+      CRITICAL DESIGN PROBLEMS:
+      1. [Specific issue - e.g., "Site uses table-based layout from 2005"]
+      2. [Specific issue - e.g., "No mobile optimization - site breaks on phones"]
+      3. [Specific issue - e.g., "Contact information buried in footer, hard to find"]
+      4. [Specific issue - e.g., "Amateur design undermines professional credibility"]
+      5. [Specific issue - e.g., "Slow loading speed (5+ seconds) loses customers"]
+
+      BUSINESS IMPACT:
+      - Professional Credibility: [How design issues hurt trust and authority]
+      - User Experience: [How issues make it hard for customers to engage]
+      - Mobile Users: [How mobile issues lose potential customers]
+      - Conversion: [How issues prevent customer contact/sales]
+
+      MODERNIZATION OPPORTUNITIES:
+      [2-3 sentences on how modern design will improve business results]
+
+      QUALITY ASSURANCE CHECKLIST
+      Before submitting your analysis, verify:
+      Content Extraction:
+      * [ ] Successfully accessed 5+ different pages
+      * [ ] Extracted complete text from each page (not summaries)
+      * [ ] Documented all services with full descriptions
+      * [ ] Captured complete contact and business information
+      * [ ] Recorded pricing details (if present)
+      * [ ] Noted company history and team information
+      * [ ] Listed all credentials and certifications
+      * [ ] Captured testimonials and reviews (complete quotes)
+      * [ ] Understood their authentic business voice and style
+      Visual Assets:
+      * [ ] Extracted 1-5 key image URLs
+      * [ ] URLs are complete and directly accessible
+      * [ ] Images are specific to this business
+      Outdated Design Assessment:
+      * [ ] Identified 4-5 specific critical issues
+      * [ ] Explained business impact of these issues
+      * [ ] Provided modernization opportunity summary
+
+      OUTPUT STRUCTURE
+      ═══════════════════════════════════════
+      WEBSITE INTELLIGENCE EXTRACTION REPORT
+      ═══════════════════════════════════════
+
+      CLIENT WEBSITE: [URL]
+      ANALYSIS DATE: [date]
+      PAGES ACCESSED: [number]
+
+      ---
+      SECTION 1: CURRENT WEBSITE ISSUES
+      ---
+      [Complete outdated design assessment from Phase 4]
+
+      ---
+      SECTION 2: COMPLETE CONTENT EXTRACTION
+      ---
+      [All page-by-page content from Phase 2]
+
+      ---
+      SECTION 3: BUSINESS INFORMATION SUMMARY
+      ---
+      [Complete business summary from Phase 2]
+
+      ---
+      SECTION 4: BRAND VOICE ANALYSIS
+      ---
+      [Communication style analysis from Phase 2]
+
+      ---
+      SECTION 5: VISUAL ASSETS
+      ---
+      [Image URLs and descriptions from Phase 3]
+
+      ---
+      SECTION 6: EXTRACTION COMPLETENESS
+      ---
+
+      Pages Successfully Accessed: [number]
+      Content Completeness: [High/Medium/Low - explain]
+      Business Understanding: [High/Medium/Low - explain]
+
+      Confidence Score: [X%]
+      Justification: [Why you assigned this score based on extraction completeness]
+
+      ═══════════════════════════════════════
+      END OF EXTRACTION REPORT
+      ═══════════════════════════════════════
+
+      IMPORTANT REMINDERS
+      1. Extract, don't summarize - Copy text exactly as written, don't paraphrase or shorten
+      2. Be thorough - The goal is zero content loss when rebuilding the site
+      3. Systematic approach - Test multiple URL patterns to find all pages
+      4. Document everything - Services, pricing, contact info, credentials, testimonials, company story
+      5. Preserve authenticity - Capture their exact writing style and business voice
+      6. Quality over speed - Better to take time and get complete extraction than rush and miss content
+
+      Your extraction report will be used to create a premium redesign that preserves 100% of the client's business content while dramatically improving visual design and user experience.
+      URL to Analyze: ${url}`;
 
 
       console.log('Prompt:', prompt);
@@ -201,6 +882,49 @@ steps:
     param: wait1
   - type: say
     message: Response 1 complete
+  - type: say
+    message: Switching Perplexity to regular search
+  - type: js
+    code: |
+      const selectors = [
+        'button[aria-label*="Deep Research"]',
+        'button',
+        '[role="button"]'
+      ];
+
+      function textMatches(el) {
+        const text = (el.innerText || el.textContent || '').toLowerCase();
+        return text.includes('deep research');
+      }
+
+      function isActive(btn) {
+        const ariaPressed = btn.getAttribute('aria-pressed');
+        const dataState = btn.getAttribute('data-state');
+        const classList = Array.from(btn.classList || []);
+        const text = (btn.innerText || btn.textContent || '').toLowerCase();
+
+        return (
+          ariaPressed === 'true' ||
+          dataState === 'on' ||
+          classList.some(c => /active|on|selected/i.test(c)) ||
+          /turn off|stop|on/.test(text)
+        );
+      }
+
+      for (const sel of selectors) {
+        const candidates = Array.from(document.querySelectorAll(sel));
+        for (const btn of candidates) {
+          if (textMatches(btn) && !btn.disabled && window.getComputedStyle(btn).display !== 'none') {
+            if (isActive(btn)) {
+              btn.click();
+              return { toggledOff: true, selector: sel, reason: 'active-state' };
+            }
+          }
+        }
+      }
+
+      return { toggledOff: false, reason: 'no-active-toggle-found' };
+    param: perplexityRegularMode
   - type: js
     code: |
       await new Promise(r => setTimeout(r, 1000));
@@ -212,52 +936,226 @@ steps:
   - type: say
     message: Prompt 2 - PRD
   - type: js
-    code: >
-      const prompt = 'You are a senior web strategist and design consultant
-      specializing in award-winning website redesigns for small businesses.
-      MISSION: Review the Website Intelligence Extraction Report you just
-      created, fill any critical gaps, then research and specify award-winning
-      design direction. PHASE 1 GAP ANALYSIS (20 percent): Review extraction for
-      missing info: Complete service descriptions, pricing, full contact info,
-      company background, team bios, credentials, testimonials, geographic
-      coverage. IF GAPS EXIST: Return to original website and extract missing
-      information. Document as ADDITIONAL EXTRACTION with category, complete
-      text, source page. PHASE 2 AWARD-WINNING DESIGN RESEARCH (80 percent):
-      PRIMARY FOCUS: Visual excellence and stunning UX. NOT priorities: SEO,
-      performance, accessibility. Search for best-in-class design: best industry
-      website design 2024, award winning industry websites, industry design
-      inspiration, luxury industry web design, premium small business design.
-      ANALYZE 5-8 EXEMPLARY WEBSITES documenting: 1. Visual Design Excellence -
-      Layout grid system white space, color palette contrast, typography
-      hierarchy, photography style, visual mood. 2. Stunning UI Elements - Hero
-      composition CTA placement, card designs shadows hover, button styles
-      micro-interactions, navigation patterns, form design, section transitions.
-      3. Premium UX - Service presentation, trust signal integration, social
-      proof display, contact CTA strategy, content organization. 4. Interactive
-      Dynamic - Scroll animations, hover states, image treatments parallax,
-      video integration, transitions. 5. Mobile Patterns - Touch-friendly
-      navigation, content prioritization, mobile interactions. OUTPUT DESIGN
-      BENCHMARK RESEARCH with industry, exemplary websites analyzed, key design
-      patterns for visual layout color typography imagery, UX navigation content
-      CTAs trust, mobile standards, conversion practices. DESIGN DIRECTION
-      SPECIFICATIONS: 1. Visual Aesthetic - Overall mood, design philosophy,
-      visual personality. 2. Color Strategy - Primary Secondary Accent colors
-      with hex codes and rationale for premium feel. 3. Typography System -
-      Heading font Body font with pairing rationale, size scale, weight
-      variations. 4. Layout Spacing - Grid system, white space philosophy,
-      section spacing, content width, mobile adaptation. 5. Photography Imagery
-      - Hero style, treatment, overlays, service images, team photos. 6. UI
-      Components - Buttons Primary Secondary Ghost specs, Cards service
-      testimonial team treatment, Forms input labels submit, Navigation desktop
-      mobile. 7. Interactive Elements - Micro-interactions, scroll animations,
-      transitions, loading states. 8. Homepage Architecture - Hero Section
-      composition impact CTA, Services layout visual interaction, Trust
-      testimonial credential authority, Contact prominence form options. 9.
-      Mobile Priorities - Touch targets thumb-friendly content navigation fast.
-      10. Design Differentiation - Unique visual elements standing out. DESIGN
-      CONFIDENCE ASSESSMENT with visual impact rating, design modernity, brand
-      fit, implementation feasibility. Combine Gap Analysis and Design Research
-      into comprehensive deliverable.';
+    code: |
+      const prompt = `PRD GENERATION for PREMIUM WEBSITE REDESIGN 
+      Visual-First Design Specifications for AI Code Generators
+      ════════════════════════════════════════════════════════════════════
+
+      <thinking_mode>
+      Use extended thinking for this task.
+      Analyze website data, invent unique visual concepts, specify "looks and feels."
+      Focus: Visual excellence and business-specific design (NOT technical implementation).
+      </thinking_mode>
+
+
+      YOUR ROLE & MISSION
+      ════════════════════════════════════════════════════════════════════
+
+      You are a senior web strategist and visual design specialist.
+
+      INPUT: Website Intelligence Extraction Report
+      OUTPUT: Visual-focused PRD  that:
+      • Preserves 100% of client's content
+      • Invents unique visual design concept for THIS business
+      • Specifies detailed "looks and feels" for AI code generators
+      • Provides hero visual design approach
+      • Prepares context for design framework implementation
+
+      NOTE: Do NOT include technical stack, SEO, performance, accessibility specs.
+      This PRD focuses PURELY on creating a visually stunning demo landing page.
+
+
+      # Take all the business information from the Chat History
+
+
+      PHASE 1: CONTENT VERIFICATION
+      ════════════════════════════════════════════════════════════════════
+
+      Review extraction for completeness:
+      □ Service descriptions □ Pricing □ Contact info □ Company history
+      □ Team members □ Credentials □ Service areas □ Testimonials  ALL TEXTS NEED TO BE IN GERMAN like the original source website
+
+      IF GAPS: Extract missing information from original website.  PRESERVATION APPROACH:
+      Try to stay as close as possible to the original extracted texts, only do slight optimization that dont change the business personality but still improve the text quality where needed 
+      OUTPUT:
+      Additional text content 
+
+      CONTENT ENHANCEMENT (Design):
+      • Typography hierarchy improves readability
+      • Modern spacing improves scannability
+      • Strategic emphasis guides attention
+      • Professional formatting improves comprehension
+
+
+
+      PHASE 2: DESIGN INTELLIGENCE RESEARCH
+      ════════════════════════════════════════════════════════════════════
+
+      Research: "best website design concepts for this specific business.
+      Focus:
+      • Modern layout patterns and visual hierarchy
+      • Professional color psychology for this industry
+      • Typography that conveys expertise
+      • style standards
+
+      OUTPUT:
+      DESIGN RESEARCH:
+
+      Industry: [Specific industry]
+
+      Key Patterns Identified:
+      • Layout: [Grid systems, focal hierarchy]
+      • Color: [color psychology]
+      • Typography: [Font strategies]
+      • UX: [Navigation and conversion patterns]
+
+
+
+      PHASE 3: VISUAL DESIGN DNA CREATION
+      ════════════════════════════════════════════════════════════════════
+
+      This defines the unique visual identity for THIS business.
+
+      VISUAL CONCEPT INVENTION:
+      ════════════════════════════════════════════════════════════════════
+      Based on industry, brand voice, and positioning, create a unique 2-3 word visual concept that will guide ALL design decisions.
+      ❌ AVOID Generic: "Modern Professional", "Clean Minimal", "Bold Dynamic"
+      ✅ CREATE Business-Specific Concepts
+      THINKING EXAMPLES (To show diversity of approach—your business may not fit any of these):
+      These are NOT categories to choose from. They demonstrate how different business characteristics demand different visual strategies:
+      * A heritage family restaurant might need: Warm, textured, grounded aesthetics (paper/wood feel, NOT glass/chrome)
+      * A modern medical practice might need: Clean, precise, calming aesthetics (clarity and trust signals)
+      * A traditional trade business might need: Bold, reliable, straightforward aesthetics (utility and strength)
+      * A personal wellness service might need: Gentle, approachable, refined aesthetics (comfort and artistry)
+      YOUR TASK: Analyze THIS specific business. What do THEY need? Don't force-fit into examples above.
+      CSS EFFECTS STRATEGY:
+      Modern CSS enables many visual approaches. Consider which effects reinforce THIS business's trust signals:
+      * Depth & Layering: Glassmorphism (backdrop-blur), hard shadows (drop-shadow), subtle elevation (box-shadow), flat borders
+      * Surface Quality: Texture overlays (noise), gradients (mesh/linear), solid colors, pattern backgrounds
+      * Light & Glow: Neon effects (text-shadow, glow), soft halos, harsh spotlights, ambient diffusion
+      * Motion & Transform: Parallax scrolling, hover lifts, smooth fades, instant snaps, spring animations
+      * Shape & Form: Rounded corners, sharp edges, organic blobs, geometric grids, asymmetric layouts
+      APPROPRIATENESS CHECK:
+      Analyze and self reflect over the given concept. Is it the best fit for the business from the PRD.  
+      YOUR TASK: 
+      Analyze THIS business deeply. Select/combine CSS approaches that build trust and match their unique positioning. Think beyond the examples—what does THIS specific business need?
+      CONCEPT DEVELOPMENT:
+      1. CONCEPT NAME: "[Your invented 2-3 word concept specific to THIS business]"
+      2. VISUAL INTERPRETATION:
+          * Atmosphere: [3 specific adjectives]
+          * Mood: [Emotional quality]
+          * Reference Analog: [Real-world physical object/space that captures this business's essence]
+      3. DESIGN MANIFESTATION:
+          * Spatial Strategy: [How space is used]
+          * Form Language: [Shape vocabulary]
+          * Depth Approach: [Specific CSS techniques you'll use and why they fit]
+          * Surface Treatment: [Textures, colors, gradients—describe the "material"]
+          * Motion Philosophy: [How elements move and why]
+
+
+
+      SPATIAL DESIGN:
+      ════════════════════════════════════════════════════════════════════
+      
+      
+      Grid: [e.g., "Asymmetric 12-col with golden ratio (8:5)"]
+      Composition: [e.g., "Diagonal energy flow top-right to bottom-left"]
+      White Space: [Generous / Balanced / Compact] - [Purpose for concept]
+      Hierarchy: [Primary focus] → [Secondary] → [Tertiary]
+      
+      these values are just examples, please think well what would be the best spatial design.  
+      RESPONSIVE STRATEGY:
+      Desktop (>1024px): [Strategy]
+      Tablet (640-1024px): [Transformation]
+      Mobile (<640px): [UNIQUE approach - NOT "stacks vertically"]
+
+
+      HERO VISUAL DESIGN APPROACH: (optional) 
+      ════════════════════════════════════════════════════════════════════ 
+      Based on VISUAL CONCEPT INVENTION, describe the hero visual approach that AI coder can implement well
+      Be descriptive about "looks and feels" rather than code.
+
+      COMPOSITION CONCEPT:
+      Elements, Represents, Visual Style 
+
+      MOBILE STRATEGY:
+
+      LOOKS & FEELS DESCRIPTION:
+      [2-3 sentences describing overall feel that AI code generator will understand]
+
+
+      PHASE 4: INTERACTIVE TOOL RECOMMENDATION (optional)
+      ════════════════════════════════════════════════════════════════════ only create if fitting for the business 
+      TOOL SELECTION:
+      Type: [Specific tool - e.g., "Project cost estimator"]
+      Problem Solved: [Customer question answered]
+      Lead Value: [How it captures and qualifies leads]
+
+      CORE FUNCTIONALITY:
+      Inputs: [List fields with types and purpose]
+      Logic: [How tool processes inputs]
+      Output: [What user receives]
+      Data Capture: [Customer info collected]
+
+      USER FLOW:
+      Tool page → User enters info → Results provided → Contact CTA
+
+      BUSINESS IMPACT:
+      Engagement | Qualification | Conversion | Expertise demonstration
+
+
+      PHASE 5: WEBSITE ARCHITECTURE
+      ════════════════════════════════════════════════════════════════════
+
+      HOMEPAGE STRUCTURE:  think of a ideal structure for this Business and  VISUAL CONCEPT INVENTION
+
+
+
+      FINAL PRD OUTPUT
+      ════════════════════════════════════════════════════════════════════
+
+      ════════════════════════════════════════════════════════════════════
+      PREMIUM WEBSITE REDESIGN PRD
+      [Business Name] - [Industry]
+      Visual Design Specifications
+      ════════════════════════════════════════════════════════════════════
+
+      EXECUTIVE SUMMARY
+      ────────────────────────────────────────────────────────────────────
+      Business: [Name, URL, industry]
+      Objectives: [Visual excellence, modern design, content preservation]
+      Design Approach: [Concept Name] - concept-driven visual redesign
+      Current Issues: [From extraction assessment]
+
+      SECTION 1: VISUAL DESIGN DNA
+      ────────────────────────────────────────────────────────────────────
+      Visual Concept: [Complete concept invention]
+      Color Strategy: [Detailed color system]
+      Typography: [Font system with rationale]
+      Spatial Design: [Layout and responsive strategy]
+      Hero Visual: [Design approach and looks/feels]
+
+      SECTION 2: WEBSITE ARCHITECTURE
+      ────────────────────────────────────────────────────────────────────
+      Homepage: [Structure with exact content]
+      Services: [All offerings with descriptions]
+      About: [Company story and team]
+      Contact: [Information and form]
+      Whatever else that would be relevant for this business
+
+
+
+      SECTION 4: SUCCESS METRICS
+      ────────────────────────────────────────────────────────────────────
+      Visual Quality: [Premium appearance, brand perception]
+      Content completeness: 
+
+      ════════════════════════════════════════════════════════════════════
+
+      PREPARATION FOR DESIGN FRAMEWORK
+      ────────────────────────────────────────────────────────────────────
+
+      Prepare and Output the PRD in a way optimized for an AI like you to generate from it a prompt for an AI coder / Web App generator like lovable.dev`;
 
 
       console.log('Prompt:', prompt);
@@ -405,183 +1303,7 @@ steps:
     message: Prompt 3 - Lovable Phase 1
   - type: js
     code: >
-      const prompt = '# LOVABLE.DEV PROMPT FRAMEWORK v3.0\n## AI-to-AI Prompt
-      Generator for Award-Winning Landing Pages\n\n---\n\n## YOUR ROLE\n\nYou
-      are a prompt engineer specializing in generating optimized Lovable.dev
-      prompts (Max 2600 words). Your task is to transform business information
-      into a comprehensive, research-backed prompt that Lovable.dev\'s Claude AI
-      will use to generate award-winning landing page code.\n\n**You do NOT
-      generate the landing page code itself. You generate the PROMPT for
-      Lovable.dev.**\n\n---\n\n## TWO-PHASE STRATEGY\n\n**Phase 1** (Output
-      now): Core structure, layout, conversion strategy (1,800-2,500
-      words)\n**Phase 2** (Output only when requested): Advanced visual
-      enhancements (1,800-2,500 words)\n\nPlan both phases strategically, but
-      output only Phase 1 unless specifically asked for Phase 2.\n\n---\n\n##
-      PHASE 1: PLANNING PROCESS\n\n### 1. Extract & Research Business
-      Context\n\nRead business information from the conversation. If critical
-      details are missing, use web_search to gather:\n- Company positioning,
-      unique value proposition, visual identity\n- Target audience demographics,
-      device usage patterns, pain points\n- Competitor design patterns for
-      differentiation opportunities\n- Industry-specific trust signals and
-      conversion best practices\n\nDocument your understanding:\n- **Company**:
-      [Name, industry, core offering]\n- **Audience**: [Specific demographic +
-      psychographic + use case]\n- **Goal**: [Measurable outcome - "Generate X
-      demos monthly" not "get leads"]\n- **Device Priority**: [Mobile-first /
-      Desktop-primary with industry justification]\n\n### 2. Define Visual
-      Strategy\n\nChoose aesthetic anchor based on brand personality:\n-
-      **Design Movement Mashup**: "Brutalism meets Scandinavian minimalism"\n-
-      **Brand Comparison**: "Stripe\'s technical precision with Notion\'s
-      warmth"\n- **Sensory Description**: "Sunlit Scandinavian cafe - clean
-      lines, natural warmth, focused calm"\n\nEstablish hierarchy intent:\n-
-      **Primary (60% attention)**: [Hero CTA / Product showcase / Value prop]\n-
-      **Secondary (30%)**: [Features / Social proof / Trust signals]\n-
-      **Tertiary (10%)**: [Footer / Navigation / Fine print]\n\nDefine color
-      strategy using emotional language:\n- **Base**: "Nordic palette with soft
-      grays and warm woods" (NOT hex codes)\n- **Accent**: "Oxidized copper" or
-      "Forest sage" (single color for conversion points)\n- **Application**:
-      "70% neutral space, accent exclusively for CTAs"\n\n### 3. Identify Core
-      Constraints\n\nSelect 3-5 positive constraints specific to this
-      business:\n1. **White Space Strategy**: 80px section padding, 60px CTA
-      isolation buffer\n2. **Typography Hierarchy**: 3-tier system (48-72px
-      hero, 32-40px sections, 16-18px body)\n3. **Asymmetric Layout**: 60/40
-      splits, magazine-style composition, avoid centered balance\n4. **Color
-      Discipline**: 3 colors max + neutrals, accent only for conversion
-      elements\n5. **Mobile-First Touch**: 44x44px minimum touch targets,
-      thumb-zone CTAs\n\n### 4. Plan Image Integration\n\nExtract image URLs
-      from conversation. Plan strategic placement:\n- **Hero**: Background or
-      split-screen composition with overlay for text readability\n- **Social
-      Proof**: Team photos, customer logos, authentic testimonials (not
-      stock)\n- **Features**: Supporting visuals, before/after comparisons,
-      process illustrations\n- **Trust Signals**: Certification badges, team
-      headshots, facility photos\n\nSpecify: `Use provided image: [URL] for
-      [section] positioned [layout description]`\n\n### 5. Allocate Content to
-      Phases\n\n**Phase 1 Focus**:\n- Page structure and layout\n- Conversion
-      strategy and CTA hierarchy\n- Core visual direction and constraints\n-
-      Functional requirements and technical stack\n- Image placement
-      strategy\n\n**Phase 2 Reserve** (don\'t output yet):\n- Framer Motion
-      animations (scroll reveals, entrance effects, parallax)\n-
-      Micro-interactions (hover states, button morphs, cursor effects)\n- Custom
-      illustrations and SVG graphics\n- Premium polish (textures, gradients, 3D
-      depth)\n- Advanced storytelling elements\n\n---\n\n## PHASE 1: OUTPUT
-      FORMAT\n\nGenerate a complete Lovable.dev prompt following this
-      structure:\n\n```\nCreate a [aesthetic description] landing page for
-      [Business], a [industry] business serving [specific target
-      audience].\n\nBUSINESS CONTEXT\n- Company: [Name and core offering]\n-
-      Audience: [Specific demographic with context and pain points]\n- Goal:
-      [Measurable conversion objective]\n- Device Priority:
-      [Mobile-first/Desktop-primary with justification]\n\nDESIGN
-      DIRECTION\nAesthetic: [Design movement mashup or sensory
-      description]\nHierarchy: Primary (60%) [element], Secondary (30%)
-      [elements], Tertiary (10%) [elements]\nColors: Base [contextual
-      description], Accent [single color name], Application [distribution
-      strategy]\n\nCORE CONSTRAINTS\n1. [Positive constraint with specific
-      measurement]\n2. [Positive constraint with specific measurement]\n3.
-      [Positive constraint with specific measurement]\n4. [Optional 4th
-      constraint]\n5. [Optional 5th constraint]\n\nTECHNICAL STACK\n- React 18 +
-      TypeScript\n- Tailwind CSS v4 (use @theme in globals.css, NOT
-      tailwind.config.js)\n- shadcn/ui components: [Auto-Form for forms, Dialog
-      for modals, DataTable if needed]\n- Framer Motion for animations\n-
-      Advanced Tailwind: backdrop-blur-sm, group-hover:, custom @keyframes,
-      motion-safe: prefix\n\nRESPONSIVE STRATEGY\n- Base: 375px mobile (no
-      prefix)\n- sm: 640px tablet adjustments\n- lg: 1024px desktop asymmetric
-      grids\n- xl: 1280px enhanced spacing\n\nIMAGE INTEGRATION\n[For each
-      provided image URL:]\n- Use [URL] in [section]: [specific placement and
-      layout treatment]\n- Example: "Use [hero-image.jpg] as hero background
-      with 40% opacity overlay for text readability"\n\nPAGE STRUCTURE\n\nHero
-      Section (Above Fold Priority)\nLayout: F-pattern flow, 60/40 asymmetric
-      split on desktop, single column mobile\nContent:\n- Headline:
-      [Benefit-focused, specific - "Close Deals 3x Faster" NOT "Best
-      Solution"]\n- Subheadline: [One sentence explaining mechanism]\n- Primary
-      CTA: 52px height, accent color, first-person copy ("Start My Free Trial"),
-      includes benefit reminder\n- Trust Signal: [Specific metric - "2,847
-      companies" OR security badge]\nVisual: [Image placement strategy with
-      overlay/positioning specs]\nSpacing: 60px CTA isolation, generous white
-      space channel funneling to action\n\nSocial Proof Section\nLayout:
-      Featured testimonial (60% visual weight) + supporting elements
-      (40%)\nContent:\n- Featured: Real photo, full name, company logo, specific
-      metric ("Increased leads 127% in 90 days")\n- Supporting: "Join 4,847
-      [audience] who [outcome] in [timeframe]"\n- Client Logos: 6-8 max,
-      grayscale for consistency\n- Industry Trust Markers: [Certifications,
-      years, case results, guarantees]\nVisual: [Testimonial image placement,
-      logo grid treatment]\n\nFeatures/Services Section\nLayout: Asymmetric
-      3-column grid (avoid symmetrical balance)\nEach Feature:\n- Icon: 48px,
-      simple geometric (NO emojis)\n- Headline: 20px, benefit-focused ("Never
-      Miss Follow-Up" NOT "Email Automation")\n- Bullets: 3 max, bold key
-      phrases\nInteractions: Cards scale 1.02 on hover (0.3s ease), shadow
-      increase\nVisual: [Feature illustration or screenshot placement if images
-      provided]\n\nCall-to-Action Section\nCTA Hierarchy:\n1. Primary: 56px
-      height, solid accent, first-person copy with benefit, 80px isolation\n2.
-      Secondary: 44px outline style, supporting action\n3. Tertiary: Text link
-      only\nForm Design (if lead generation):\n- Progressive disclosure:
-      Multi-step (email → details → contact)\n- Progress indicator: Visual bar
-      "Step 1 of 3"\n- Fields: 48px height, 16px font, labels above (not
-      placeholder-only)\n- Trust micro-copy: "We never share your email" with
-      lock icon\n- Inline validation: Checkmark on valid format\nMobile: Sticky
-      bottom bar (60px) after 50% scroll, primary CTA + offer
-      reminder\n\nFooter\nMinimal visual weight, 30% opacity colors, 14px
-      text\nContent: Company info, privacy/terms, social links, newsletter
-      signup (tertiary priority)\n\nDESIGN EXCELLENCE\n\nWhite Space: 80px
-      section padding desktop, 60px mobile, 8px grid system
-      (16/24/32/40/48/64/80 multiples)\n\nMicro-Interactions: (200-400ms
-      duration)\n- Buttons: Scale 1.05 hover, 0.95 active, 0.3s ease\n- Links:
-      Underline slide from left (0.2s), color shift to accent\n- Cards:
-      translateY(-4px) with shadow enhancement\n- Icons: 5° rotation or slight
-      scale\n- Form fields: Border to accent on focus (0.2s)\n\nTypography:\n-
-      Headline letter-spacing: -0.02em (tighter for impact)\n- Body
-      letter-spacing: 0.01em (loose for readability)\n- Line length: 65
-      characters max\n- No single-word line endings in headlines\n\nColor
-      Application:\n- Base: 70% of visual space\n- Accent: Exclusively for
-      conversion elements (CTAs, links, interactive states)\n- Trust
-      backgrounds: Brand color at 5% opacity\n- Urgency elements: Warm accent at
-      10% opacity for timers/limited offers\n\nDepth System:\n- Cards at rest:
-      2px shadow\n- Hover: 8px shadow\n- Active/Modal: 24px shadow\n- Layered
-      shadows: shadow-sm shadow-primary/10, shadow-md shadow-primary/5\n\nMOBILE
-      OPTIMIZATION\n- Touch targets: 44x44px minimum\n- Thumb-zone: Primary CTAs
-      bottom third of viewport\n- Single-column flow on 375px base\n- Test text
-      overflow with long strings\n- No horizontal scroll\n- Sticky elements
-      respect safe-area-insets\n\nCRITICAL REMINDERS\n1. Front-load important
-      important content - users decide in 5 seconds\n2. Single dominant CTA per
-      viewport section\n3. Restrained color palette (3 max + neutrals)\n4.
-      Generous white space (80px padding) = premium perception\n5. Mobile-first
-      with 44px touch targets\n\nGoal: Award-winning design that converts. Every
-      design choice has strategic intent. Balance premium aesthetics with clear
-      conversion strategy.\n\nStart building now.\n```\n\n---\n\n## PHASE 1:
-      QUALITY CHECKLIST\n\nBefore outputting the prompt, verify:\n- [ ] Business
-      context is specific (not generic)\n- [ ] Aesthetic anchor creates clear
-      visual direction\n- [ ] All constraints are positive ("Use X" not "Avoid
-      Y")\n- [ ] Measurements are specific (80px, 0.3s, 44x44px)\n- [ ]
-      Conversion strategy embedded in each section\n- [ ] Industry trust signals
-      identified\n- [ ] All provided image URLs integrated with placement
-      strategy\n- [ ] Advanced Tailwind features requested\n- [ ] Mobile
-      requirements include exact touch targets\n- [ ] Critical constraints
-      appear at start AND end (primacy/recency)\n- [ ] Word count: 1,800-2,500
-      words\n- [ ] NO meta-commentary - just the prompt itself\n\n---\n\n##
-      PHASE 2: STRATEGY (Keep in Context, Don\'t Output Yet)\n\nWhen user
-      requests "generate Phase 2 prompt", create enhancement prompt (1,800-2,500
-      words):\n\n**Structure:**\n```\nEnhance the landing page with premium
-      visual refinements:\n\nADVANCED ANIMATIONS (500 words)\n[Framer Motion
-      implementations: scroll reveals, entrance sequences, parallax
-      effects]\n[Specify variants, timing functions, stagger patterns, trigger
-      conditions]\n\nMICRO-INTERACTIONS (400 words)\n[Button morphs, card
-      reveals, cursor effects, loading sequences]\n[Precise timing, easing
-      functions, hover choreography]\n\nCUSTOM ILLUSTRATIONS (300 words)\n[SVG
-      elements, abstract shapes, brand-aligned graphics, icon
-      systems]\n[Geometric patterns, organic shapes framing content]\n\nPREMIUM
-      POLISH (400 words)\n[Textures, noise patterns, gradient systems,
-      typography treatments]\n[3D perspective effects, glassmorphic layers,
-      depth enhancements]\n\nINTERACTIVE STORYTELLING (400 words)\n[Scroll-based
-      transitions, animated data visualizations, timeline
-      progressions]\n[Before/after sliders, testimonial carousels, product
-      showcases]\n\nMaintain core structure and conversion strategy. Focus
-      exclusively on elevating visual sophistication to award-winning
-      standards.\n```\n\n**Phase 2 reserves:**\n- Framer Motion scroll reveals
-      with useInView\n- Magnetic buttons with cursor proximity\n- Staggered
-      animations with orchestration\n- Custom cursor interactions\n- Animated
-      gradient backgrounds\n- Kinetic typography\n- 3D card transforms on
-      hover\n- Smooth page transitions\n- Progress indicators and loading
-      states\n- Interactive data visualizations\n\n---\n\n## OUTPUT\n\nGenerate
-      the complete Phase 1 Lovable.dev prompt now. Output ONLY the prompt  (max
-      2600 words)- no explanations, no commentary, no meta-discussion.';
+      const prompt = "# The Lovable.dev Prompting Framework v2.0\n## For Generating Visually Stunning Small Business Landing Pages\n\n---\n\n## Meta-Instructions: How to Use This Framework\n\n**Your Role:** You are an AI prompt architect. Your job is to take a Product Requirements Document (PRD) for a small business landing page and transform it into a high-quality implementation prompt for Lovable.dev.\n\n**Lovable.dev's Strengths:**\n- React + Tailwind + TypeScript architecture\n- Semantic token-based design system (index.css + tailwind.config.ts)\n- AI image generation (integrated)\n- Component variants and shadcn/ui customization\n- framer-motion for sophisticated animations\n\n**Lovable.dev's Requirements:**\n- All colors must be HSL in the design system\n- No inline styles or ad-hoc color classes (text-white, bg-slate-900)\n- Images imported from src/assets/ as ES6 modules\n- Mobile-first responsive design\n- Semantic tokens over hardcoded values\n\n**Your Output:** A complete, actionable prompt (1,400-2,000 words) that Lovable can execute immediately to create a production-ready landing page.\n\n---\n\n## Part 1: PRD Extraction Protocol\n\n### Step 1: Parse Business Fundamentals\n\nExtract ONLY what is explicitly stated in the PRD:\n\n```markdown\n**Business Identity:**\n- Name: [exact name from PRD]\n- Industry: [specific industry/category]\n- Target Audience: [who they serve]\n- Location: [only if PRD mentions it - city/region, no neighborhood details]\n- Years in Business: [only if PRD states it]\n\n**Services/Offerings:**\n[List each service/product with any descriptions provided]\n1. [Service name]: [brief description if given]\n2. [Service name]: [brief description if given]\n[continue...]\n\n**Brand Assets (if provided):**\n- Logo: [URL or description]\n- Brand Colors: [specific colors if mentioned]\n- Photography: [any image URLs or style directions]\n- Tone/Voice: [any explicit brand voice guidelines]\n\n**Contact Information:**\n- Phone: [if provided]\n- Email: [if provided]\n- Address: [if provided]\n- Other Channels: [WhatsApp, social media, etc.]\n\n**Trust Elements (only if explicitly provided):**\n- Testimonials: [actual quotes with attribution]\n- Certifications/Awards: [specific ones mentioned]\n- Social Proof: [metrics, affiliations]\n```\n\n**CRITICAL RULES:**\n- \u274c Do NOT invent: years in business, awards, testimonials, neighborhood names, \"voted #1\" claims\n- \u274c Do NOT assume: location details beyond what's stated, services not listed, brand personality\n- \u2705 DO state \"Not provided in PRD\" when information is missing\n- \u2705 DO use your judgment for: visual concept names, design system choices, technical implementation\n\n---\n\n### Step 2: Define Emotional Goal\n\nThe PRD should state or imply an emotional goal. Extract or infer it:\n\n**Emotional Goal Analysis:**\n- Primary Emotion: [trust / excitement / calm / prestige / warmth / innovation / reliability]\n- Secondary Emotion: [supporting feeling]\n- Avoid: [emotions to avoid, e.g., clinical coldness for a spa, chaotic energy for a law firm]\n\n**Translation to Design:**\n[2-3 sentences explaining how this emotional goal will manifest visually]\n\nExample:\n> \"Primary: Calm confidence. Secondary: Professional care. The design should feel like a high-end spa meets medical precision - reassuring but never cold. Avoid: Sterile hospital aesthetics, overly playful/childish elements.\"\n\n---\n\n## Part 2: Visual Synthesis (The Core)\n\n### Step 3: Four-Spectrum Analysis\n\nMap the design on these spectra (0-100%, choose specific values):\n\n**LUMINOSITY SPECTRUM**\n```\n0%                    50%                    100%\nDark/Cinematic \u2190\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2192 Bright/Airy\n```\n**Selection:** [e.g., 75% - Bright but not stark]\n**Rationale:** [Why this serves the emotional goal]\n\n**MATERIALITY SPECTRUM**\n```\n0%                    50%                    100%\nSynthetic/Glass \u2190\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2192 Organic/Natural\n```\n**Selection:** [e.g., 30% - Subtle glass effects with natural warmth]\n**Rationale:** [Why this fits the industry]\n\n**TEMPERATURE SPECTRUM**\n```\n0%                    50%                    100%\nCool/Clinical \u2190\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2192 Warm/Inviting\n```\n**Selection:** [e.g., 65% - Warm-leaning but professional]\n**Rationale:** [Why this matches the audience]\n\n**SHAPE LANGUAGE SPECTRUM**\n```\n0%                    50%                    100%\nSharp/Geometric \u2190\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2192 Soft/Rounded\n```\n**Selection:** [e.g., 70% - Predominantly rounded with subtle geometric structure]\n**Rationale:** [Why this supports the brand]\n\n---\n\n### Step 4: Visual Anchor Metaphor (MANDATORY)\n\nCreate a single, vivid metaphor that captures the entire design physics:\n\n**Format:**\n> \"This design feels like [sensory description using real-world materials and lighting].\"\n\n**Examples of Strong Anchors:**\n- \u2705 \"Like a matte-black credit card with holographic edges catching light\"\n- \u2705 \"Like morning sunlight filtering through sheer linen curtains onto warm oak\"\n- \u2705 \"Like a precision medical instrument displayed on a softly lit pedestal\"\n- \u2705 \"Like watercolor paper with ink bleeding at the edges\"\n\n**Examples of Weak Anchors:**\n- \u274c \"Modern and clean\" (too vague)\n- \u274c \"Professional website feel\" (not sensory)\n- \u274c \"Minimalist with some color\" (no clear physics)\n\n**Your Visual Anchor:**\n[Write a single sentence here]\n\n---\n\n### Step 5: Concept Name\n\nBased on the spectra + anchor, create a 2-3 word unique concept name:\n\n**Concept Name:** [e.g., \"Ceramic Warmth\" / \"Glass Precision\" / \"Urban Bloom\" / \"Coastal Clarity\"]\n\n**NOT allowed:** Generic terms like \"Modern Clean\", \"Professional Look\", \"Nice Design\"\n\n---\n\n## Part 3: Design System Architecture (MOST CRITICAL SECTION)\n\nThis section is where 80% of visual quality is determined. Be extremely specific.\n\n### Step 6: Color Token System (HSL Only)\n\nDefine the complete color system using HSL values. Lovable will implement these in index.css.\n\n```markdown\n## COLOR SYSTEM\n\n### Primary Color (Main Brand)\n- Token: --primary\n- HSL Value: [H S% L%]  (e.g., 217 91% 60%)\n- Hex Reference: [#hex] (for your reference only)\n- Usage:\n  * All H1, H2 headline accents\n  * Primary CTA buttons (via 'hero' variant)\n  * Service card icon fills\n  * Hover states on key interactive elements\n  * Primary shadow color base\n\n### Primary Foreground (Text on Primary)\n- Token: --primary-foreground\n- HSL Value: [H S% L%]\n- Usage: Text/icons on primary-colored surfaces\n\n### Secondary Color (Accent)\n- Token: --secondary\n- HSL Value: [H S% L%]\n- Hex Reference: [#hex]\n- Usage:\n  * Secondary CTAs\n  * Accent borders\n  * Supporting icon colors\n  * Subtle highlights\n\n### Secondary Foreground\n- Token: --secondary-foreground\n- HSL Value: [H S% L%]\n- Usage: Text on secondary surfaces\n\n### Background System\n- Token: --background\n- HSL Value: [H S% L%]\n- Description: [Base page background - solid, gradient start, or neutral]\n\n- Token: --foreground\n- HSL Value: [H S% L%]\n- Description: Primary body text color\n\n### Card System\n- Token: --card\n- HSL Value: [H S% L%] (may include transparency note)\n- Description: [Card background - consider glassmorphism if Material < 40%]\n\n- Token: --card-foreground\n- HSL Value: [H S% L%]\n\n### Muted Elements\n- Token: --muted\n- HSL Value: [H S% L%]\n- Description: Subtle backgrounds for less prominent sections\n\n- Token: --muted-foreground\n- HSL Value: [H S% L%]\n- Description: Secondary text, captions, metadata\n\n### Border System\n- Token: --border\n- HSL Value: [H S% L%]\n- Description: [Standard borders - consider transparency based on Luminosity]\n\n### Accent System\n- Token: --accent\n- HSL Value: [H S% L%]\n- Description: Hover states, active indicators\n\n- Token: --accent-foreground\n- HSL Value: [H S% L%]\n\n### Custom Tokens (Based on Visual Style)\n\n#### Gradient Definitions (if Luminosity < 30% or > 70%)\n- Token: --gradient-hero-start\n- HSL Value: [H S% L%]\n\n- Token: --gradient-hero-end\n- HSL Value: [H S% L%]\n\n- Implementation: `bg-gradient-to-br from-[--gradient-hero-start] to-[--gradient-hero-end]`\n\n#### Shadow System\n- Token: --shadow-primary\n- Definition: `0 8px 32px hsl([primary-HSL] / 0.25)`\n- Usage: Elevated cards, primary CTAs\n\n- Token: --shadow-ambient\n- Definition: `0 4px 16px hsl([foreground-HSL] / 0.06)`\n- Usage: Subtle depth on standard cards\n\n- Token: --shadow-hover\n- Definition: `0 12px 48px hsl([primary-HSL] / 0.35)`\n- Usage: Hover state on interactive cards\n\n#### Glass Effects (if Materiality < 40%)\n- Token: --glass-surface\n- HSL Value: [typically white or card color] / [opacity 5-10%]\n- Backdrop: blur-2xl or blur-3xl\n- Border: --border with / 0.1 transparency\n```\n\n**Validation Checklist:**\n- \u25a1 All HSL values are complete (H S% L%)\n- \u25a1 No RGB or hex values in implementation notes\n- \u25a1 Shadow definitions use HSL with transparency syntax\n- \u25a1 Glass effects specify backdrop-blur level\n- \u25a1 Each token has clear usage guidelines\n\n---\n\n### Step 7: Tailwind Config Extension Code\n\nProvide the EXACT code for Lovable to add to tailwind.config.ts:\n\n```typescript\n// Add to tailwind.config.ts in the extend section\n\ncolors: {\n  border: \"hsl(var(--border))\",\n  background: \"hsl(var(--background))\",\n  foreground: \"hsl(var(--foreground))\",\n  primary: {\n    DEFAULT: \"hsl(var(--primary))\",\n    foreground: \"hsl(var(--primary-foreground))\",\n  },\n  secondary: {\n    DEFAULT: \"hsl(var(--secondary))\",\n    foreground: \"hsl(var(--secondary-foreground))\",\n  },\n  card: {\n    DEFAULT: \"hsl(var(--card))\",\n    foreground: \"hsl(var(--card-foreground))\",\n  },\n  muted: {\n    DEFAULT: \"hsl(var(--muted))\",\n    foreground: \"hsl(var(--muted-foreground))\",\n  },\n  accent: {\n    DEFAULT: \"hsl(var(--accent))\",\n    foreground: \"hsl(var(--accent-foreground))\",\n  },\n  // Add custom gradient colors if defined\n  // gradient: {\n  //   start: \"hsl(var(--gradient-hero-start))\",\n  //   end: \"hsl(var(--gradient-hero-end))\",\n  // },\n},\n\nboxShadow: {\n  'primary': 'var(--shadow-primary)',\n  'ambient': 'var(--shadow-ambient)',\n  'hover': 'var(--shadow-hover)',\n},\n```\n\n---\n\n### Step 8: Component Variants\n\nDefine custom variants for shadcn components based on the visual style:\n\n```markdown\n## COMPONENT VARIANT SPECIFICATIONS\n\n### Button Variants\nAdd to src/components/ui/button.tsx:\n\n**hero variant:**\n```tsx\nhero: \"bg-primary text-primary-foreground text-lg px-8 py-4 rounded-2xl \n       font-semibold shadow-primary hover:shadow-hover hover:scale-[1.02] \n       transition-all duration-300\"\n```\nUsage: Primary CTAs in hero section\n\n**secondary variant (override default if needed):**\n```tsx\nsecondary: \"bg-secondary text-secondary-foreground px-6 py-3 rounded-xl \n            border border-border hover:bg-accent transition-colors duration-200\"\n```\nUsage: Secondary CTAs\n\n**ghost-outline variant:**\n```tsx\nghostOutline: \"bg-transparent text-foreground border-2 border-border \n               hover:bg-card/50 px-6 py-3 rounded-xl transition-all duration-200\"\n```\nUsage: Tertiary actions, \"Learn more\" links\n\n### Card Treatments (based on Concept)\n\nChoose ONE approach based on your spectrum analysis:\n\n**If Materiality < 40% (Glass/Tech):**\n```tsx\n// Use these classes for service cards and content blocks\n\"bg-card/5 backdrop-blur-2xl border border-border/50 rounded-2xl p-6 \n shadow-ambient hover:shadow-primary transition-all duration-300\"\n```\n\n**If Materiality 40-60% (Balanced):**\n```tsx\n\"bg-card border border-border rounded-2xl p-6 shadow-ambient \n hover:shadow-primary transition-shadow duration-300\"\n```\n\n**If Materiality > 60% (Organic/Natural):**\n```tsx\n\"bg-card rounded-3xl p-8 shadow-[0_20px_50px_hsl(var(--foreground)/0.08)] \n hover:shadow-[0_24px_60px_hsl(var(--foreground)/0.12)] \n transition-shadow duration-300\"\n```\n\n### Section Containers\n\n**Hero Section:**\n```tsx\n\"min-h-screen flex items-center bg-background relative overflow-hidden\"\n```\n\n**Services Section:**\n```tsx\n\"py-24 px-4 bg-muted/30\"\n```\n\n**Contact Section:**\n```tsx\n\"py-20 px-4 bg-background\"\n```\n```\n\n---\n\n## Part 4: Typography System\n\n### Step 9: Font Pairing\n\nSelect fonts that match the emotional goal and concept:\n\n```markdown\n## TYPOGRAPHY\n\n### Display Font (Headlines, CTAs)\n**Font Name:** [Google Font name]\n**Character:** [e.g., \"Geometric sans with friendly rounded terminals\"]\n**Why:** [1 sentence connecting to emotional goal]\n**Apply to:** H1, H2, H3, primary buttons\n\n**Google Fonts Import:**\n```html\n<!-- Lovable will add this appropriately -->\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link href=\"https://fonts.googleapis.com/css2?family=[Font+Name]:wght@600;700;800&display=swap\" rel=\"stylesheet\">\n```\n\n### Body Font (Paragraphs, UI)\n**Font Name:** [Different Google Font]\n**Character:** [e.g., \"Humanist sans with excellent readability\"]\n**Why:** [1 sentence on complementary nature]\n**Apply to:** Body text, descriptions, UI labels\n\n**Import:**\n```html\n<link href=\"https://fonts.googleapis.com/css2?family=[Font+Name]:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n```\n\n### CSS Variable Definitions\n```css\n/* Add to index.css */\n:root {\n  --font-display: '[Font Name]', sans-serif;\n  --font-body: '[Font Name]', sans-serif;\n}\n\nbody {\n  font-family: var(--font-body);\n}\n```\n\n### Typography Scale (Tailwind Classes)\n- **H1:** `font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[0.95] tracking-tight`\n- **H2:** `font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight`\n- **H3:** `font-display text-2xl md:text-3xl font-semibold leading-snug`\n- **Body Large:** `font-body text-lg md:text-xl leading-relaxed`\n- **Body Standard:** `font-body text-base leading-relaxed`\n- **Small/Caption:** `font-body text-sm leading-normal text-muted-foreground`\n```\n\n**Font Pairing Rules:**\n- \u274c Don't use: Inter, Poppins, Roboto (overused in AI design)\n- \u274c Don't pair: Two geometric sans, two serif fonts\n- \u2705 Do use: Display with character + neutral body font\n- \u2705 Do consider: Industry norms (serif for law/finance, sans for tech/health)\n\n---\n\n## Part 5: Image Strategy\u2028\u2028Check if Image urls are available and integrate them in the prompt at the right place for this design \n\n### Step 10: Determine Image Needs\n\nAnalyze the PRD and decide what images to generate:\n\n```markdown\n## IMAGE GENERATION PROTOCOL\n\n### Decision Matrix\n\n**Hero Image - Generate?**\n[YES / NO]\n\n**If YES:**\n- **Dimensions:** [1920x1080 for full-width OR 1200x1200 for split-screen]\n- **Model:** flux.dev (high quality for hero)\n- **Generation Prompt:**\n  ```\n  [Detailed prompt based on Visual Anchor + business context]\n  \n  Example structure:\n  \"[Visual Anchor translated to image] + [business-specific elements] + [lighting/atmosphere] + ultra high resolution, professional photography\"\n  \n  Actual example:\n  \"Warm afternoon sunlight streaming through large windows onto a modern dental chair and equipment, clean white surfaces with natural wood accents, soft shadows, welcoming medical environment, ultra high resolution, professional photography, shallow depth of field\"\n  ```\n- **Save Path:** `src/assets/hero-[business-type].jpg`\n- **Implementation:** `import heroImage from '@/assets/hero-[business-type].jpg'`\n\n**If NO:**\n- **Alternative Approach:** [Icon composition / Abstract gradient / Geometric shapes]\n- **Reason:** [Why this is better - e.g., services are abstract, icons communicate faster]\n\n### Section/Background Images\n[Repeat structure for any additional needed images]\n\n### Service-Specific Icons\n**Use lucide-react exclusively.** Select icons that are:\n- Literal for physical services (Wrench, Scissors, Utensils)\n- Metaphorical for concepts (Shield for trust, Zap for speed, Heart for care)\n\n**Icon Specifications:**\n1. [Service name]: `<[IconName] className=\"w-12 h-12 text-primary\" />` - [Why this icon]\n2. [Service name]: `<[IconName] className=\"w-12 h-12 text-primary\" />` - [Why]\n3. [Service name]: `<[IconName] className=\"w-12 h-12 text-primary\" />` - [Why]\n[continue for all services]\n```\n\n**Image Generation Best Practices:**\n- Generate for: Restaurants, retail, spas, medical, real estate (visual businesses)\n- Skip for: B2B services, consulting, legal, accounting (abstract businesses work better)\n- Always specify lighting and atmosphere in prompts\n- Match the visual anchor's material qualities\n\n---\n\n## Part 6: Responsive Architecture (Mobile-First)\n\n### Step 11: Layout Strategy\n\n```markdown\n## RESPONSIVE DESIGN SPECIFICATION\n\n### Mobile Foundation (320px - 767px)\nThe primary design. Desktop enhances it.\n\n#### Hero Section (Mobile)\n**Layout:**\n- Container: `min-h-screen flex flex-col justify-center px-4 py-12`\n- Order: Headline \u2192 Subheadline \u2192 CTA \u2192 Simplified Visual (or hide complex visuals)\n\n**Typography (Mobile):**\n- H1: `text-4xl leading-[1.1]` (42-48px, ensures readability without zoom)\n- Subheadline: `text-lg leading-relaxed` (18-20px)\n\n**CTAs (Mobile):**\n- Primary: `w-full py-4 text-lg` (full width, large touch target)\n- Secondary: `w-full py-3 mt-3` (stacked below primary)\n\n**Hero Visual (Mobile):**\n- **If image:** Scale to full width, reduce height to 60vh, position below CTAs\n- **If icon composition:** Reduce to 1-2 key elements, remove complex layering\n- **Decision rule:** Prioritize message over decoration\n\n#### Services Section (Mobile)\n**Grid:** `flex flex-col space-y-6`\n- Single column stack\n- Each card: `w-full p-6`\n- Icons: `w-16 h-16` (larger than desktop for impact)\n- Touch targets: Ensure any tappable area is min 44px height\n\n#### Contact Section (Mobile)\n**Layout:**\n- Phone/Email as large tappable buttons: `w-full py-4 text-lg`\n- Use `tel:` and `mailto:` links\n- Address (if applicable): Full width, clear typography\n\n---\n\n### Tablet Adaptation (768px - 1023px)\n\n#### Hero Section (Tablet)\n**Decision:** [Keep stacked OR introduce 2-column if both text and visual fit comfortably]\n- Recommended: `grid md:grid-cols-2 md:gap-8`\n- Visual complexity can increase slightly\n\n#### Services Section (Tablet)\n**Grid:** `md:grid-cols-2 md:gap-6`\n- Two columns, maintain clear spacing\n- Icons can reduce to `w-12 h-12`\n\n---\n\n### Desktop Experience (1024px+)\n\n#### Hero Section (Desktop)\n**Layout:** `grid lg:grid-cols-2 lg:gap-16 max-w-7xl mx-auto px-8`\n- Split: 50/50 or 60/40 (favor text if copy-heavy)\n- Left: Text content, generous spacing between elements\n- Right: Full visual composition (layered elements, complex imagery)\n\n**Typography (Desktop):**\n- H1: `lg:text-6xl xl:text-7xl`\n- More line-height breathing room: `leading-[0.95]`\n\n**Visual Composition (Desktop):**\n- Use absolute positioning for layered elements\n- Implement subtle parallax or float animations\n- Z-index strategy: background (10) < cards (20) < foreground (30)\n\n#### Services Section (Desktop)\n**Grid:** `lg:grid-cols-3 lg:gap-8`\n- Three columns for standard services\n- **Optional:** Featured service spans 2 columns: `lg:col-span-2`\n\n**Hover States (Desktop Only):**\n- Cards: `hover:scale-[1.02] hover:shadow-hover`\n- Buttons: `hover:shadow-primary-hover`\n- Smooth transitions: `transition-all duration-300`\n\n---\n\n### Breakpoint Summary Table\n\n| Breakpoint | Container | Hero Layout | Services Grid | Font Size (H1) |\n|------------|-----------|-------------|---------------|----------------|\n| Mobile (<768px) | px-4 | Stack | 1 col | text-4xl |\n| Tablet (768-1023px) | px-6 | 2-col or stack | 2 col | text-5xl |\n| Desktop (>1024px) | max-w-7xl px-8 | 2-col split | 3 col | text-6xl-7xl |\n```\n\n---\n\n## Part 7: Hero Section Implementation (Detailed)\n\n### Step 12: Hero Specification\n\nThis is the most critical section. Be extremely specific.\n\n```markdown\n## HERO SECTION - COMPLETE SPECIFICATION\n\n### Goal\n[1 sentence: What should the visitor feel/understand in 3 seconds?]\n\n### Layout Architecture\n\n**Mobile (<768px):**\n```tsx\n<section className=\"min-h-screen flex flex-col justify-center px-4 py-12 bg-background relative\">\n  {/* Background effects (gradients/orbs) */}\n  \n  {/* Content wrapper */}\n  <div className=\"relative z-20 max-w-xl mx-auto text-center\">\n    {/* Headline */}\n    <h1 className=\"font-display text-4xl font-bold leading-[1.1] text-foreground mb-4\">\n      [Actual headline from PRD or crafted tagline]\n    </h1>\n    \n    {/* Subheadline */}\n    <p className=\"text-lg leading-relaxed text-muted-foreground mb-8\">\n      [Value proposition - what makes this business special]\n    </p>\n    \n    {/* CTAs */}\n    <div className=\"flex flex-col space-y-3\">\n      <Button variant=\"hero\" size=\"lg\" className=\"w-full\">\n        [Primary CTA text]\n      </Button>\n      <Button variant=\"ghostOutline\" className=\"w-full\">\n        [Secondary CTA text]\n      </Button>\n    </div>\n  </div>\n  \n  {/* Simplified visual or hidden */}\n  {/* [Mobile visual strategy specified below] */}\n</section>\n```\n\n**Desktop (>1024px):**\n```tsx\n<section className=\"min-h-screen flex items-center px-8 bg-background relative overflow-hidden\">\n  {/* Background effects */}\n  \n  <div className=\"max-w-7xl mx-auto w-full\">\n    <div className=\"grid lg:grid-cols-2 gap-16 items-center\">\n      {/* Left: Content */}\n      <div className=\"relative z-20\">\n        <h1 className=\"font-display text-6xl lg:text-7xl font-bold leading-[0.95] tracking-tight text-foreground mb-6\">\n          [Headline]\n        </h1>\n        \n        <p className=\"text-xl leading-relaxed text-muted-foreground mb-10\">\n          [Subheadline]\n        </p>\n        \n        <div className=\"flex flex-col sm:flex-row gap-4\">\n          <Button variant=\"hero\" size=\"lg\">\n            [Primary CTA]\n          </Button>\n          <Button variant=\"ghostOutline\" size=\"lg\">\n            [Secondary CTA]\n          </Button>\n        </div>\n      </div>\n      \n      {/* Right: Visual Composition */}\n      <div className=\"relative h-[600px] hidden lg:block\">\n        {/* [Visual composition specified below] */}\n      </div>\n    </div>\n  </div>\n</section>\n```\n\n### Visual Composition Strategy\n\n**Choose ONE based on image generation decision:**\n\n#### Option A: Generated Hero Image\n```tsx\n{/* If hero image was generated */}\n<div className=\"relative h-[600px] hidden lg:block\">\n  <img \n    src={heroImage} \n    alt=\"[Descriptive alt text related to business]\"\n    className=\"w-full h-full object-cover rounded-3xl shadow-primary\"\n  />\n  <div className=\"absolute inset-0 bg-gradient-to-t from-background/80 to-transparent rounded-3xl\" />\n</div>\n```\n\n#### Option B: Icon Composition (for service businesses)\n```tsx\n{/* Complex icon-based composition */}\n<div className=\"relative h-[600px] hidden lg:block\">\n  {/* Background ambient glow */}\n  <div className=\"absolute top-20 right-20 w-96 h-96 bg-primary/20 rounded-full blur-[120px] z-0\" />\n  \n  {/* Primary service card */}\n  <motion.div \n    className=\"absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30\n               bg-card/80 backdrop-blur-2xl border border-border rounded-2xl p-8 \n               shadow-primary\"\n    initial={{ opacity: 0, scale: 0.9 }}\n    animate={{ opacity: 1, scale: 1 }}\n    transition={{ duration: 0.6 }}\n  >\n    <[PrimaryServiceIcon] className=\"w-16 h-16 text-primary mb-4\" />\n    <h3 className=\"font-display text-2xl font-bold text-foreground\">\n      [Primary service name]\n    </h3>\n  </motion.div>\n  \n  {/* Satellite card 1 */}\n  <motion.div \n    className=\"absolute top-24 right-32 z-20\n               bg-card/60 backdrop-blur-xl border border-border rounded-xl p-6\n               shadow-ambient rotate-2\"\n    initial={{ opacity: 0, x: 20 }}\n    animate={{ opacity: 1, x: 0 }}\n    transition={{ duration: 0.6, delay: 0.2 }}\n  >\n    <[SecondaryServiceIcon] className=\"w-10 h-10 text-secondary mb-2\" />\n    <p className=\"text-sm font-semibold text-foreground\">\n      [Service feature]\n    </p>\n  </motion.div>\n  \n  {/* Satellite card 2 */}\n  <motion.div \n    className=\"absolute bottom-32 left-24 z-20\n               bg-card/60 backdrop-blur-xl border border-border rounded-xl p-6\n               shadow-ambient -rotate-2\"\n    initial={{ opacity: 0, x: -20 }}\n    animate={{ opacity: 1, x: 0 }}\n    transition={{ duration: 0.6, delay: 0.4 }}\n  >\n    <[TertiaryServiceIcon] className=\"w-10 h-10 text-accent mb-2\" />\n    <p className=\"text-sm font-semibold text-foreground\">\n      [Service feature]\n    </p>\n  </motion.div>\n</div>\n```\n\n**Specify exactly:**\n1. Primary icon name (lucide-react)\n2. 2-3 supporting icons\n3. Positioning (top-*, right-*, absolute coordinates)\n4. Rotation angles (rotate-2, -rotate-2)\n5. Z-index layers\n6. What each element represents (from PRD services)\n\n#### Option C: Abstract/Geometric (for conceptual businesses)\n```tsx\n{/* Gradient and shape composition */}\n<div className=\"relative h-[600px] hidden lg:block\">\n  {/* Layered gradient circles */}\n  <div className=\"absolute inset-0 flex items-center justify-center\">\n    <div className=\"w-[400px] h-[400px] bg-gradient-to-br from-primary/30 to-secondary/30 \n                    rounded-full blur-3xl\" />\n    <div className=\"absolute w-[300px] h-[300px] bg-gradient-to-tl from-accent/40 to-primary/20 \n                    rounded-full blur-2xl translate-x-24 -translate-y-12\" />\n  </div>\n  \n  {/* Geometric overlay */}\n  <div className=\"absolute inset-0 flex items-center justify-center\">\n    <div className=\"w-64 h-64 border-2 border-primary/30 rounded-3xl rotate-12\" />\n    <div className=\"absolute w-48 h-48 border border-secondary/20 rounded-2xl -rotate-6\" />\n  </div>\n</div>\n```\n\n### Background Treatment\n\nBased on Luminosity spectrum:\n\n**If Luminosity < 30% (Dark):**\n```tsx\n<div className=\"absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 z-0\" />\n<div className=\"absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] z-5\" />\n```\n\n**If Luminosity > 70% (Bright):**\n```tsx\n<div className=\"absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background z-0\" />\n```\n\n### Content Specifications\n\n**Headline:**\n[Write the actual headline based on PRD, or provide a template]\n- Length: 6-10 words ideal\n- Formula: [Action/Benefit] + [For whom] + [Unique aspect]\n- Example: \"Precision Dental Care for Your Family's Healthiest Smiles\"\n\n**Subheadline:**\n[Actual subheadline or template]\n- Length: 15-25 words\n- Formula: [How you deliver] + [Key differentiator] + [Location if relevant]\n- Example: \"State-of-the-art treatments delivered with gentle, personalized care in the heart of downtown Portland.\"\n\n**Primary CTA:**\n[Actual button text]\n- Examples: \"Book Appointment\" / \"Get Free Quote\" / \"Call Now\" / \"View Services\"\n\n**Secondary CTA:**\n[Actual button text]\n- Examples: \"Learn More\" / \"See Our Work\" / \"Meet the Team\" / \"Call Us\"\n```\n\n---\n\n## Part 8: Services Section Implementation\n\n### Step 13: Services Layout\n\n```markdown\n## SERVICES SECTION SPECIFICATION\n\n### Section Container\n```tsx\n<section className=\"py-24 px-4 bg-muted/30\">\n  <div className=\"max-w-7xl mx-auto\">\n    {/* Section header */}\n    <div className=\"text-center mb-16\">\n      <h2 className=\"font-display text-4xl lg:text-5xl font-bold text-foreground mb-4\">\n        Our Services\n      </h2>\n      <p className=\"text-xl text-muted-foreground max-w-2xl mx-auto\">\n        [Brief intro to services, 1-2 sentences]\n      </p>\n    </div>\n    \n    {/* Services grid */}\n    <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8\">\n      {/* Service cards */}\n    </div>\n  </div>\n</section>\n```\n\n### Service Card Structure\n\nFor EACH service from the PRD, specify:\n\n```tsx\n{/* Service: [Name from PRD] */}\n<div className=\"[card classes from Component Variants section]\">\n  {/* Icon */}\n  <div className=\"mb-6\">\n    <[SpecificIcon] className=\"w-12 h-12 text-primary\" />\n  </div>\n  \n  {/* Service name */}\n  <h3 className=\"font-display text-2xl font-semibold text-foreground mb-3\">\n    [Service name from PRD]\n  </h3>\n  \n  {/* Description */}\n  <p className=\"text-base leading-relaxed text-muted-foreground mb-4\">\n    [Description from PRD, or craft 60-80 word description that:\n     - States what it is clearly\n     - Mentions 1-2 key benefits\n     - Avoids marketing fluff]\n  </p>\n  \n  {/* Optional: Learn more link if this is a featured service */}\n  {/* <button className=\"text-sm text-primary hover:text-primary/80 font-medium\">\n    Learn more \u2192\n  </button> */}\n</div>\n```\n\n**Icon Selection for Each Service:**\n1. [Service 1 name]: `[IconName]` - Rationale: [why this icon represents it]\n2. [Service 2 name]: `[IconName]` - Rationale: [why]\n3. [Service 3 name]: `[IconName]` - Rationale: [why]\n[Continue for all services]\n\n### Featured Service Treatment (if applicable)\n\nIf one service should be emphasized:\n\n```tsx\n{/* Featured service - spans 2 columns on desktop */}\n<div className=\"lg:col-span-2 [enhanced card classes] border-2 border-primary/20\">\n  {/* Larger icon */}\n  <[FeaturedIcon] className=\"w-16 h-16 text-primary mb-6\" />\n  \n  {/* More prominent typography */}\n  <h3 className=\"font-display text-3xl font-bold text-foreground mb-4\">\n    [Featured service name]\n  </h3>\n  \n  {/* Longer description */}\n  <p className=\"text-lg leading-relaxed text-muted-foreground mb-6\">\n    [100-120 word description with more detail]\n  </p>\n  \n  {/* CTA */}\n  <Button variant=\"secondary\">\n    [CTA for this service]\n  </Button>\n</div>\n```\n```\n\n---\n\n## Part 9: Trust & Contact Sections\n\n### Step 14: Trust Signals (Only if PRD Provides)\n\n```markdown\n## TRUST SECTION (Conditional)\n\n**Include this section ONLY if PRD explicitly provides:**\n- Testimonials with real quotes and names\n- Certifications, awards, or affiliations\n- Verifiable metrics (years in business, customers served)\n\n### If Trust Elements Exist:\n\n```tsx\n<section className=\"py-20 px-4 bg-background\">\n  <div className=\"max-w-5xl mx-auto\">\n    <h2 className=\"font-display text-3xl lg:text-4xl font-bold text-center text-foreground mb-12\">\n      Why Choose Us\n    </h2>\n    \n    <div className=\"grid md:grid-cols-2 lg:grid-cols-3 gap-8\">\n      {/* Testimonial card (if provided) */}\n      <div className=\"[card classes] p-6\">\n        <p className=\"text-base italic text-muted-foreground mb-4\">\n          \"[Actual quote from PRD]\"\n        </p>\n        <p className=\"text-sm font-semibold text-foreground\">\n          \u2014 [Actual name from PRD]\n        </p>\n      </div>\n      \n      {/* Certification badge (if provided) */}\n      <div className=\"[card classes] p-6 flex flex-col items-center text-center\">\n        <Shield className=\"w-12 h-12 text-primary mb-4\" />\n        <h4 className=\"font-display text-lg font-semibold text-foreground mb-2\">\n          [Certification name from PRD]\n        </h4>\n      </div>\n      \n      {/* Add more trust elements as provided in PRD */}\n    </div>\n  </div>\n</section>\n```\n\n**If NO trust elements in PRD:**\nSkip this section entirely. Do not invent testimonials or awards.\n```\n\n---\n\n### Step 15: Contact Section\n\n```markdown\n## CONTACT SECTION\n\n### Layout Strategy\n\n```tsx\n<section className=\"py-20 px-4 bg-muted/20\">\n  <div className=\"max-w-4xl mx-auto\">\n    {/* Header */}\n    <div className=\"text-center mb-12\">\n      <h2 className=\"font-display text-4xl lg:text-5xl font-bold text-foreground mb-4\">\n        Get In Touch\n      </h2>\n      <p className=\"text-xl text-muted-foreground\">\n        [Inviting message about contacting them]\n      </p>\n    </div>\n    \n    {/* Contact methods */}\n    <div className=\"grid md:grid-cols-2 gap-6 mb-12\">\n      {/* Phone (if provided) */}\n      {/* [Phone number from PRD] */}\n      <a href=\"tel:[phone-number]\" \n         className=\"[card classes] p-8 flex items-center space-x-4 hover:shadow-hover transition-shadow\">\n        <Phone className=\"w-8 h-8 text-primary\" />\n        <div>\n          <p className=\"text-sm text-muted-foreground mb-1\">Call us</p>\n          <p className=\"text-xl font-semibold text-foreground\">[formatted phone]</p>\n        </div>\n      </a>\n      \n      {/* Email (if provided) */}\n      <a href=\"mailto:[email]\"\n         className=\"[card classes] p-8 flex items-center space-x-4 hover:shadow-hover transition-shadow\">\n        <Mail className=\"w-8 h-8 text-primary\" />\n        <div>\n          <p className=\"text-sm text-muted-foreground mb-1\">Email us</p>\n          <p className=\"text-xl font-semibold text-foreground\">[email]</p>\n        </div>\n      </a>\n      \n      {/* Location (if provided) */}\n      {/* [Address from PRD] */}\n      \n      {/* Other channels (WhatsApp, social, etc. if provided) */}\n    </div>\n    \n    {/* Optional: Simple contact form (visual only, non-functional for this demo) */}\n    <div className=\"[card classes] p-8\">\n      <h3 className=\"font-display text-2xl font-bold text-foreground mb-6\">\n        Send a Message\n      </h3>\n      \n      {/* Form fields - styled but non-functional */}\n      <form className=\"space-y-4\">\n        <input \n          type=\"text\" \n          placeholder=\"Your Name\"\n          className=\"w-full px-4 py-3 rounded-xl border border-border bg-background \n                     text-foreground focus:ring-2 focus:ring-primary focus:outline-none\"\n        />\n        <input \n          type=\"email\" \n          placeholder=\"Your Email\"\n          className=\"w-full px-4 py-3 rounded-xl border border-border bg-background \n                     text-foreground focus:ring-2 focus:ring-primary focus:outline-none\"\n        />\n        <textarea \n          placeholder=\"Your Message\"\n          rows={4}\n          className=\"w-full px-4 py-3 rounded-xl border border-border bg-background \n                     text-foreground focus:ring-2 focus:ring-primary focus:outline-none\"\n        />\n        <Button type=\"button\" variant=\"hero\" className=\"w-full\">\n          Send Message\n        </Button>\n        <p className=\"text-xs text-muted-foreground text-center mt-2\">\n          Note: This is a visual demo. Form does not submit.\n        </p>\n      </form>\n    </div>\n  </div>\n</section>\n```\n\n### Contact Information Display\n\n**Use actual data from PRD:**\n- Phone: [actual number in (XXX) XXX-XXXX format]\n- Email: [actual email]\n- Address: [actual address if provided]\n- Business Hours: [if provided]\n- Other: [WhatsApp, social links if provided]\n\n**If any contact method is NOT in PRD:** Omit that section rather than using placeholders.\n```\n\n---\n\n## Part 10: Animation & Interaction\n\n### Step 16: Motion Guidelines\n\n```markdown\n## ANIMATION STRATEGY\n\n### Philosophy\nAnimations must be:\n- **Subtle:** Enhance, not distract\n- **Professional:** No bounces, spins, or cartoonish effects\n- **Purposeful:** Each animation should guide attention or provide feedback\n- **Performance-conscious:** Use transforms and opacity, avoid animating layout properties\n\n### Implementation Approach\n\n**Hero Animations (using framer-motion):**\n```tsx\nimport { motion } from 'framer-motion';\n\n// Headline entrance\n<motion.h1\n  initial={{ opacity: 0, y: 20 }}\n  animate={{ opacity: 1, y: 0 }}\n  transition={{ duration: 0.6, ease: \"easeOut\" }}\n>\n  [Headline]\n</motion.h1>\n\n// Staggered CTA appearance\n<motion.div\n  initial={{ opacity: 0 }}\n  animate={{ opacity: 1 }}\n  transition={{ duration: 0.6, delay: 0.3 }}\n>\n  [CTAs]\n</motion.div>\n\n// Hero visual elements (if icon composition)\n<motion.div\n  initial={{ opacity: 0, scale: 0.95 }}\n  animate={{ opacity: 1, scale: 1 }}\n  transition={{ duration: 0.6, delay: 0.2 }}\n>\n  [Visual element]\n</motion.div>\n```\n\n**Service Cards (CSS hover states):**\n```tsx\n// In the card className:\n\"transition-all duration-300 hover:scale-[1.02] hover:shadow-hover\"\n\n// For the icon within:\n\"transition-transform duration-300 group-hover:scale-110\"\n```\n\n**Scroll-triggered Animations (optional, if appropriate):**\n```tsx\n// For services that appear as user scrolls\n<motion.div\n  initial={{ opacity: 0, y: 30 }}\n  whileInView={{ opacity: 1, y: 0 }}\n  viewport={{ once: true, margin: \"-100px\" }}\n  transition={{ duration: 0.5 }}\n>\n  [Service card]\n</motion.div>\n```\n\n### Hover State Specifications\n\n**Buttons:**\n- Scale: `hover:scale-105` (5% growth)\n- Shadow: From `shadow-primary` to `shadow-hover`\n- Duration: `transition-all duration-300`\n\n**Cards:**\n- Scale: `hover:scale-[1.02]` (2% growth - very subtle)\n- Shadow: From `shadow-ambient` to `shadow-primary`\n- Duration: `transition-all duration-300`\n\n**Links:**\n- Color: From `text-primary` to `text-primary/80`\n- Underline: `hover:underline`\n\n### Animation Don'ts\n- \u274c No rotate more than 6 degrees\n- \u274c No bounce or elastic easing\n- \u274c No animations longer than 0.8s\n- \u274c No simultaneous movement on 3+ axes\n- \u274c No animations that prevent interaction\n```\n\n---\n\n## Part 11: Implementation Guardrails\n\n### Step 17: Error Prevention\n\n```markdown\n## CRITICAL IMPLEMENTATION RULES\n\n### NEVER Do These:\n\u2028SEO, Accessibility or Performance Optimization (out of scope)\u2028\u2028\n\u274c **Color Anti-Patterns:**\n- Never use: `text-white`, `bg-white`, `text-black`, `bg-black`, `text-slate-900`, `bg-purple-500`\n- Never use RGB: `rgba(255,255,255,0.5)`\n- Never use hex directly: `#3B82F6`\n\n\u2705 **Always use semantic tokens:**\n- `text-foreground`, `bg-background`, `text-primary`, `bg-card`\n- `hsl(var(--primary))` for custom uses\n\n\u274c **Styling Anti-Patterns:**\n- Never use inline styles for design: `style={{ background: '...' }}`\n- Never use arbitrary Tailwind without design system: `bg-[#FF5733]`\n- Never override with !important in components\n\n\u2705 **Always use:**\n- Design system tokens from index.css\n- Component variants defined in Step 8\n- Tailwind classes that reference CSS variables\n\n\u274c **Image Anti-Patterns:**\n- Never use placeholder URLs: `https://via.placeholder.com/...`\n- Never use external CDN images without caching: `https://unsplash.com/...`\n- Never reference public/ folder for generated images\n\n\u2705 **Always:**\n- Generate images with imagegen tool\n- Save to `src/assets/`\n- Import as ES6: `import heroImage from '@/assets/hero.jpg'`\n\n\u274c **Typography Anti-Patterns:**\n- Never use font stacks directly: `font-family: 'Arial', sans-serif`\n- Never use pixel values: `font-size: 24px`\n- Never use raw weights in components: `font-weight: 700`\n\n\u2705 **Always:**\n- Use font variables: `font-display`, `font-body`\n- Use Tailwind classes: `text-4xl`, `font-bold`\n- Define in design system first\n\n\u274c **Responsive Anti-Patterns:**\n- Never design desktop-first then shrink down\n- Never hide content on mobile without alternative\n- Never use fixed pixel widths: `width: 400px`\n\n\u2705 **Always:**\n- Design mobile-first, enhance for desktop\n- Provide mobile alternatives for complex visuals\n- Use responsive classes: `w-full md:w-1/2 lg:w-1/3`\n\n### ALWAYS Do These:\n\n\u2705 **Before Writing Any Code:**\n1. Define complete design system in index.css (all HSL values)\n2. Extend tailwind.config.ts with custom tokens\n3. Create component variants for buttons and cards\n4. Decide on image generation strategy\n5. Map out responsive behavior for each section\n\n\u2705 **For Every Component:**\n1. Use semantic tokens exclusively\n2. Implement mobile-first\n3. Add hover states for interactive elements\n4. Ensure touch targets are min 44px on mobile\n5. Test readability at each breakpoint\n\n\u2705 **For Images:**\n1. Generate with specific prompts matching visual anchor\n2. Use appropriate dimensions (1920x1080 for heroes)\n3. Save to src/assets/ with descriptive names\n4. Import as ES6 modules\n5. Include descriptive alt text\n\n\u2705 **For Animations:**\n1. Use framer-motion for entrance animations\n2. Use Tailwind transitions for hover states\n3. Keep durations between 0.2s - 0.6s\n4. Use ease-out or ease-in-out easing\n5. Test on slower devices (consider prefers-reduced-motion)\n```\n\n---\n\n## Part 12: Quality Validation\n\n### Step 18: Pre-Delivery Checklist\n\n```markdown\n## FINAL QUALITY CHECKLIST\n\nBefore considering the prompt complete, verify each item:\n\n### Design System Completeness\n- \u25a1 All color tokens defined in index.css with HSL values\n- \u25a1 Light and dark mode values specified (even if only using one)\n- \u25a1 Shadow system defined (--shadow-primary, --shadow-ambient, --shadow-hover)\n- \u25a1 Gradient tokens defined if Luminosity is extreme (<30% or >70%)\n- \u25a1 Font variables defined (--font-display, --font-body)\n- \u25a1 tailwind.config.ts extensions provided with exact code\n- \u25a1 Component variants specified for Button and Card at minimum\n\n### Content Accuracy\n- \u25a1 All information sourced from PRD (no fabrications)\n- \u25a1 Service descriptions are specific and honest\n- \u25a1 Contact information is actual data (or \"not provided\" noted)\n- \u25a1 Trust signals only included if PRD provides them\n- \u25a1 Headlines and CTAs are actionable and clear\n- \u25a1 No placeholder text remains ([TBD], [Business name], etc.)\n\n### Visual Coherence\n- \u25a1 Visual Anchor Metaphor is defined and referenced\n- \u25a1 Four-spectrum analysis is complete with rationales\n- \u25a1 Concept Name is unique and descriptive (not \"Modern Clean\")\n- \u25a1 All visual choices trace back to emotional goal\n- \u25a1 Hero visual strategy is specific (image prompt OR icon layout)\n- \u25a1 Icon selections match services literally or metaphorically\n\n### Responsive Design\n- \u25a1 Mobile layout is completely specified (not just \"stack everything\")\n- \u25a1 Tablet adaptations are noted\n- \u25a1 Desktop enhancements are detailed\n- \u25a1 Touch targets are 44px minimum on mobile\n- \u25a1 Typography scales responsively (text-4xl md:text-5xl lg:text-6xl)\n- \u25a1 Complex visuals have mobile alternatives or are hidden appropriately\n\n### Technical Specifications\n- \u25a1 All imports are correct (framer-motion, lucide-react, assets)\n- \u25a1 All icon names are valid lucide-react components\n- \u25a1 Image generation prompts are complete (if generating images)\n- \u25a1 Image save paths and import statements are provided\n- \u25a1 Animation code uses proper syntax (framer-motion or Tailwind)\n- \u25a1 No forbidden patterns (text-white, inline styles, RGB colors)\u2028- \u25a1 No SEO, Accessibility or Performance Optimization \u2028\n### Implementation Readiness\n- \u25a1 Code snippets are complete (not just \"...\")\n- \u25a1 Section structures include full className lists\n- \u25a1 Hover states and transitions are specified\n- \u25a1 Z-index hierarchy is defined where needed\n- \u25a1 Spacing is specified (padding, margin, gap)\n- \u25a1 The prompt can be executed without additional clarifying questions\n\n### Prompt Quality\n- \u25a1 Word count is 1,400-2,000 (dense, no fluff)\n- \u25a1 Every section provides new information\n- \u25a1 No redundancy between sections\n- \u25a1 Tone is directive and specific\n- \u25a1 Examples are concrete, not theoretical\n- \u25a1 Lovable can start building immediately upon reading\u2028- \u25a1 Only prompt, no intro line, so it can just be copy pasted\u2028\n```\n\n---\n\n## Part 13: Prompt Output Format\n\n### Step 19: Final Prompt Structure\n\n```markdown\n## YOUR FINAL OUTPUT\n\nStructure your prompt to Lovable.dev EXACTLY as follows:\n\n---\n\n# [Business Name] Landing Page - Implementation Brief\n\n## Project Context\n[2-3 sentences: Business type, target audience, primary goal]\n\n---\n\n## DESIGN SYSTEM\n\n### Color Tokens\n[Complete HSL definitions from Step 6]\n\n### Tailwind Config Extension\n[Exact code from Step 7]\n\n### Component Variants\n[Button and Card variants from Step 8]\n\n---\n\n## VISUAL IDENTITY\n\n### Concept\n**Name:** [Concept name]\n**Anchor:** [Visual anchor metaphor]\n\n### Spectrum Analysis\n- Luminosity: [Value + rationale]\n- Materiality: [Value + rationale]\n- Temperature: [Value + rationale]\n- Shape Language: [Value + rationale]\n\n---\n\n## TYPOGRAPHY\n[Font specifications from Step 9]\n\n---\n\n## IMAGE STRATEGY\n[Generation decisions from Step 10]\n\n---\n\n## HERO SECTION\n[Complete specification from Step 12]\n- Layout (mobile/desktop)\n- Visual composition (detailed)\n- Content (actual text)\n- Background treatment\n- Animations\n\n---\n\n## SERVICES SECTION\n[Complete specification from Step 13]\n- Grid layouts\n- Card structure\n- Icon selections\n- Content for each service\n\n---\n\n## TRUST SECTION (if applicable)\n[From Step 14]\n\n---\n\n## CONTACT SECTION\n[From Step 15]\n\n---\n\n## ANIMATION & INTERACTION\n[From Step 16]\n\n---\n\n## IMPLEMENTATION NOTES\n- All colors use semantic tokens\n- Images generated/saved to src/assets/\n- Mobile-first responsive approach\n- Subtle, professional animations only\n- Touch targets 44px minimum\n\n---\n\nEND OF PROMPT\n```\n\n---\n\n## Part 14: Self-Reflection & Iteration\n\n### After Generating the Prompt\n\nAsk yourself:\n\n1. **Specificity Check:**\n   - Can Lovable build this without asking clarifying questions?\n   - Are there any \"[TBD]\" or placeholder elements?\n   - Are all color values actual HSL numbers?\n\n2. **Coherence Check:**\n   - Does every section reference the Visual Anchor?\n   - Do all choices support the Emotional Goal?\n   - Is there a clear through-line from concept to implementation?\n\n3. **Lovable Alignment Check:**\n   - Are you using HSL colors exclusively?\n   - Have you specified component variants?\n   - Did you leverage image generation where appropriate?\n   - Is the design system defined first?\n\n4. **Quality Check:**\n   - Would you show this to a business owner as a demo?\n   - Does it feel bespoke (not templated)?\n   - Is the hero section truly stunning?\n   - Are mobile users respected (not just desktop shrunk down)?\n\n5. **Efficiency Check:**\n   - Is the prompt 1,400-2,000 words of dense information?\n   - Did you eliminate redundancy?\n   - Are you repeating color specs across sections? (fix)\n   - Could any section be condensed without losing clarity?\n\n**If any answer is \"no\" or \"maybe\":** Revise before submitting to Lovable.\n\n---\n\n## Appendix: Common Pitfalls & Solutions\n\n### Pitfall 1: \"Generic Modern Design\"\n**Problem:** The design could apply to any business in any industry.\n**Solution:** Force specificity in Visual Anchor and icon choices. The hero visual must include business-specific elements.\n\n### Pitfall 2: \"Wall of Purple Gradients\"\n**Problem:** Every AI-designed site uses purple gradients with glass effects.\n**Solution:** Use the Four-Spectrum Analysis to force different choices. If Warmth > 60%, purple is likely wrong. Match industry norms.\n\n### Pitfall 3: \"Mobile is Desktop Stacked\"\n**Problem:** No thought given to mobile UX beyond \"make it single column.\"\n**Solution:** Design mobile-first with intentional decisions about hierarchy, touch targets, and what to simplify/hide.\n\n### Pitfall 4: \"Scattered Color Values\"\n**Problem:** Colors defined in multiple places, leading to inconsistency.\n**Solution:** Define ONCE in Design System section. Reference everywhere else.\n\n### Pitfall 5: \"Invented Local Details\"\n**Problem:** Prompt includes \"20 years serving the community\" when PRD didn't state this.\n**Solution:** Strict PRD adherence. Mark missing info as \"[Not provided]\".\n\n### Pitfall 6: \"Icon Composition Too Generic\"\n**Problem:** \"Floating cards with generic icons\" that don't relate to the business.\n**Solution:** Each icon must represent a specific service from PRD. Layer meaningfully.\n\n### Pitfall 7: \"Animations Everywhere\"\n**Problem:** Every element animates, creating visual chaos.\n**Solution:** Limit to hero entrance + service card hovers. Subtle only.\n\n### Pitfall 8: \"No Image Generation\"\n**Problem:** Missing opportunity for custom imagery when appropriate.\n**Solution:** Generate for visual businesses (food, retail, health, spa). Skip for abstract B2B.\n\n---\n\n## Final Meta-Note to Prompt Architect\n\n**Your success metric:** Lovable builds a stunning, production-ready landing page on the first pass without needing to ask clarifying questions.\n\n**Remember:**\n- Specificity > Generality\n- Design System > Ad-hoc Styles\n- Mobile-First > Desktop-First\n- HSL > RGB/Hex\n- Semantic Tokens > Direct Colors\n- Bespoke > Templated\n- Professional Subtlety > Flashy Effects\n\n**Trust Lovable to:**\n- Handle build optimization\n- Manage imports correctly\n- Apply responsive breakpoints\n- Implement animations smoothly\n\n**Don't tell Lovable to:**\n- \"Make it SEO friendly\" (out of scope)\n- \"Add accessibility features\" (basic semantics only)\n- \"Optimize performance\" (it does this automatically)\n- \"Consider adding...\" (either specify it or don't)\n\n**Your job:** Provide a complete, specific, actionable design vision. Lovable will execute it beautifully.\n\n---\n\nEND OF FRAMEWORK"
 
 
       console.log('Prompt:', prompt);
@@ -1184,6 +1906,92 @@ steps:
     message: Phase 2 complete
   - type: wait
     timeout: 3000
+    for: idle
+  - type: say
+    message: Pasting ChatGPT image prompt into Lovable
+  - type: js
+    code: |
+      const text = (args.chatgptOutput && args.chatgptOutput.copiedText) || '';
+
+      await new Promise(r => setTimeout(r, 2000));
+
+      const input = document.querySelector('textarea#chatinput');
+
+      if (!input) return { error: 'No input found' };
+
+      input.focus();
+
+      await new Promise(r => setTimeout(r, 1000));
+
+      const nativeInputValueSetter =
+        Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+
+      nativeInputValueSetter.call(input, text);
+
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+
+      await new Promise(r => setTimeout(r, 500));
+
+      return { success: Boolean(text), length: text.length };
+    args: chatgptOutput
+    param: lovablePasteChatgpt
+  - type: wait
+    timeout: 2000
+    for: idle
+  - type: say
+    message: Submitting ChatGPT image prompt
+  - type: js
+    code: |
+      await new Promise(r => setTimeout(r, 1000));
+
+      const btn = document.querySelector('button#chatinput-send-message-button');
+
+      if (!btn || btn.disabled) return { error: 'Button not ready' };
+
+      btn.click();
+
+      await new Promise(r => setTimeout(r, 1000));
+
+      return { success: true };
+    param: lovableSubmit3
+  - type: say
+    message: Waiting for ChatGPT prompt generation
+  - type: js
+    code: |
+      const maxWait = 600;
+      let waited = 0;
+      const checkInterval = 3;
+      let generationStarted = false;
+
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
+
+        const stopBtn = document.querySelector('button[aria-label*="Stop"]');
+        const textarea = document.querySelector('textarea#chatinput');
+        const button = document.querySelector('button#chatinput-send-message-button');
+
+        const textareaReady = textarea && !textarea.disabled;
+        const buttonExists = !!button;
+        const buttonDisabled = button && button.disabled;
+
+        if (stopBtn || buttonDisabled) {
+          generationStarted = true;
+        }
+
+        if (generationStarted && !stopBtn && textareaReady && buttonExists && !buttonDisabled) {
+          return { finished: true, waitedSeconds: waited, generationStarted };
+        }
+
+        if (waited % 15 === 0) {
+          console.log('Still generating ChatGPT prompt...', waited, 'seconds');
+        }
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited, generationStarted };
+    param: lovableWait3
+  - type: wait
+    timeout: 2000
     for: idle
   - type: say
     message: Extracting links

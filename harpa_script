@@ -1,10 +1,10 @@
 meta:
-  title: v4.5 Complete - Site to PRD to Lovable to Data
+  title: v4.6 Complete - Site to PRD to Lovable to Data
   description: Analyzes site, generates PRD and Lovable prompt, auto-deploys
   category: User
 steps:
   - type: say
-    message: Starting v4.5 automation
+    message: Starting v4.6 automation
   - type: ask
     param: siteUrl
     message: Enter site URL
@@ -1430,38 +1430,79 @@ steps:
           input = document.querySelector(sel);
           if (input) break;
         }
-        if (!stop && input) {
-          return { finished: true, waitedSeconds: waited };
-        }
-        await new Promise(r => setTimeout(r, check * 1000));
-        waited += check;
-      }
-      return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: wait3
-  - type: say
-    message: Phase 1 prompt ready
-  - type: say
-    message: Extracting Phase 1 text
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 2000));
+      const prompt = `# PHASE 2 TRIGGER PROMPT
 
-      let msgs = Array.from(document.querySelectorAll('div.prose'));
+      ---
 
-      if (msgs.length === 0) return '';
+      ## Generate Phase 2: Premium Polish
 
-      return (msgs[msgs.length - 1].innerText || msgs[msgs.length -
-      1].textContent || '').trim();
-    param: phase1Prompt
-  - type: say
-    message: Phase 1 stored
-  - type: wait
-    timeout: 3000
-    for: idle
-  - type: say
+      You previously generated a Phase 1 prompt for the Business from the PRD using the your design concept. The user has reviewed the implementation and is ready for the premium polish phase.
+
+      ### Your Task
+
+      Generate the Phase 2 prompt that elevates the existing implementation. Phase 2 focuses on:
+
+      **Interaction & Motion**
+      - Enhanced hover states (micro-interactions that feel alive)
+      - Scroll-triggered animations (elements revealing with purpose)
+      - State transitions (smooth, intentional feedback)
+
+      **Visual Depth**
+      - Layering and dimensional effects
+      - Background visual interest (subtle patterns, gradients, atmospheric elements)  
+      - Image integration refinements (soft edges, blending, contextual placement)
+
+      **Delightful Details**
+      - Moments of unexpected polish that elevate perception
+      - Details that make the site feel crafted, not templated
+      - Small touches aligned with the Visual Anchor mood
+
+      ### Phase 2 Rules
+
+      1. **Reference, don't redefine** — Use the existing Concept Name and Visual Anchor. Don't re-explain the design system.
+
+      2. **Enhance, don't rebuild** — No structural changes, no new sections, no content changes.
+
+      3. **Specific but not prescriptive** — Describe what interactions should *feel like*, not exact implementation code.
+
+      4. **Prioritize impact** — Focus on 3-5 high-impact enhancements rather than exhaustive lists.
+
+      5. **Stay on-brand** — All enhancements must feel consistent with the Visual Anchor metaphor.
+
+      ### Phase 2 Output Format
+
+      ```markdown
+      # [BUSINESS NAME] — Phase 2: Premium Polish
+      ## Enhancing "[Concept Name]"
+
+      ### Interaction Enhancements
+      [2-3 specific interaction improvements with intent descriptions]
+
+      ### Motion Refinements  
+      [2-3 animation enhancements that add life and purpose]
+
+      ### Visual Depth Additions
+      [1-2 layering or atmospheric enhancements]
+
+      ### Detail Polish
+      [1-2 small delightful touches]
+
+      ---
+
+      Refine the existing implementation with these enhancements. 
+      Maintain the "[Visual Anchor metaphor]" feeling throughout.
+      Do not change structure or content — only elevate the craft.
+      ```
+
+      ### Anti-Patterns (Avoid)
+
+      - ❌ Repeating any content from Phase 1
+      - ❌ Suggesting structural changes or new sections
+      - ❌ Specifying exact CSS values or animation timings
+      - ❌ Generic requests ("make it more modern")
+      - ❌ Changes that contradict the Visual Anchor mood
+
+      **Generate the Phase 2 prompt now, building on the established Design foundation established in Phase 1.**`;
     message: Prompt 4 - Phase 2 Enhancement
   - type: wait
     timeout: 3000

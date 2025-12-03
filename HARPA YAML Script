@@ -1,11 +1,11 @@
 meta:
-  title: v4.0 Complete - Site to PRD to Lovable to Data
+  title: v4.6 Complete - Site to PRD to Lovable to Data
   description: Analyzes site, generates PRD and Lovable prompt, auto-deploys
   category: User
 
 steps:
   - type: say
-    message: Starting v4.0 automation
+    message: Starting v4.6 automation
 
   - type: ask
     param: siteUrl
@@ -260,7 +260,79 @@ steps:
 
   - type: js
     code: |
-      const prompt = 'Generate Phase 2 enhancement prompt for Lovable. CRITICAL: Output ONLY the prompt, no intro. First word Enhance. PHASE 2 FOCUS: NOT structure or content, page already built. ADD advanced visual refinements, sophisticated animations, premium polish, interactive elements. OPTIMAL 1200-1800 words. Front-load impactful enhancements. FRAMEWORK: First 300 tokens Enhance existing maintain structure focus visual. Positive Add X not Improve. Specific Implement parallax 0.5 speed. Exact timing 0.8s ease-out. CATEGORIES: ADVANCED ANIMATIONS 40 percent: Hero entrance headline 0.6s subhead delay 0.3s CTA 0.4s, background parallax gradient particle. Scroll Reveals stagger 0.1s delay translateY 40px to 0, scale 0.9 to 1.0, trigger 80 percent viewport useInView. Section Transitions diagonal 5-7 degrees, fade crossfade, parallax 0.3-0.7 speeds. MICRO-INTERACTIONS 30 percent: Buttons hover scale 1.05 shadow 4-12px 0.3s, active 0.95, ripple, icons slide 4px. Cards hover translateY -8px shadow, content reveal, border glow, tilt 2-3deg perspective. Forms focus border scale 1.02, label float, checkmark valid, shake error. Links underline slide 0.2s, color morph, icon rotate 5deg. VISUAL POLISH 20 percent: Glassmorphic backdrop-blur-md semi-transparent, overlays modals. Gradients animated 3-5s cycles, mesh multiple stops, text fills. Textures noise 2-3 percent opacity, patterns low opacity, organic shapes. Shadows layered multiple, accent-tinted 15 percent, elevation 2px 8px 24px states. INTERACTIVE 10 percent: Scroll progress bar top fills, section highlights. Cursor custom magnetic trail. Loading skeletons progress optimistic. TECHNICAL: Framer Motion import motion useScroll useTransform useInView, variants sequences, useInView triggers, useScroll parallax. Performance transforms only never layout, motion-safe prefix, 60fps target. Timing fast 0.2-0.3s ease, medium 0.4-0.6s ease-in-out, slow 0.8-1.2s custom, stagger 0.1s delay. OUTPUT: Enhance existing maintain structure. ADVANCED ANIMATIONS hero scroll sections. MICRO-INTERACTIONS buttons cards forms links. VISUAL POLISH glass gradients textures shadows. INTERACTIVE progress cursor loading. TECHNICAL motion performance timing. REMINDERS maintain content structure brand 60fps motion-safe. Implement now.';
+      const prompt = `# PHASE 2 TRIGGER PROMPT
+
+      ---
+
+      ## Generate Phase 2: Premium Polish
+
+      You previously generated a Phase 1 prompt for the Business from the PRD using the your design concept. The user has reviewed the implementation and is ready for the premium polish phase.
+
+      ### Your Task
+
+      Generate the Phase 2 prompt that elevates the existing implementation. Phase 2 focuses on:
+
+      **Interaction & Motion**
+      - Enhanced hover states (micro-interactions that feel alive)
+      - Scroll-triggered animations (elements revealing with purpose)
+      - State transitions (smooth, intentional feedback)
+
+      **Visual Depth**
+      - Layering and dimensional effects
+      - Background visual interest (subtle patterns, gradients, atmospheric elements)  
+      - Image integration refinements (soft edges, blending, contextual placement)
+
+      **Delightful Details**
+      - Moments of unexpected polish that elevate perception
+      - Details that make the site feel crafted, not templated
+      - Small touches aligned with the Visual Anchor mood
+
+      ### Phase 2 Rules
+
+      1. **Reference, don't redefine** — Use the existing Concept Name and Visual Anchor. Don't re-explain the design system.
+
+      2. **Enhance, don't rebuild** — No structural changes, no new sections, no content changes.
+
+      3. **Specific but not prescriptive** — Describe what interactions should *feel like*, not exact implementation code.
+
+      4. **Prioritize impact** — Focus on 3-5 high-impact enhancements rather than exhaustive lists.
+
+      5. **Stay on-brand** — All enhancements must feel consistent with the Visual Anchor metaphor.
+
+      ### Phase 2 Output Format
+
+      ```markdown
+      # [BUSINESS NAME] — Phase 2: Premium Polish
+      ## Enhancing "[Concept Name]"
+
+      ### Interaction Enhancements
+      [2-3 specific interaction improvements with intent descriptions]
+
+      ### Motion Refinements  
+      [2-3 animation enhancements that add life and purpose]
+
+      ### Visual Depth Additions
+      [1-2 layering or atmospheric enhancements]
+
+      ### Detail Polish
+      [1-2 small delightful touches]
+
+      ---
+
+      Refine the existing implementation with these enhancements. 
+      Maintain the "[Visual Anchor metaphor]" feeling throughout.
+      Do not change structure or content — only elevate the craft.
+      ```
+
+      ### Anti-Patterns (Avoid)
+
+      - ❌ Repeating any content from Phase 1
+      - ❌ Suggesting structural changes or new sections
+      - ❌ Specifying exact CSS values or animation timings
+      - ❌ Generic requests ("make it more modern")
+      - ❌ Changes that contradict the Visual Anchor mood
+
+      **Generate the Phase 2 prompt now, building on the established Design foundation established in Phase 1.**`;
       
       let input = document.querySelector('div[role="textbox"][aria-label="Prompt"]');
       if (!input) input = document.querySelector('[contenteditable="true"]');

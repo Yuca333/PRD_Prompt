@@ -1,10 +1,10 @@
 meta:
-  title: v4.7 Complete - Site to PRD to Lovable to Data
+  title: v4.8 Complete - Site to PRD to Lovable to Data
   description: End-to-end automation from site to PRD to Lovable with stored prompts
   category: User
 steps:
   - type: say
-    message: Starting v4.7 automation
+    message: Starting v4.8 automation
 
   - type: ask
     param: siteUrl
@@ -90,7 +90,7 @@ steps:
 
       CRITICAL OUTPUT RULES
       • Do NOT output “BLOCK A” or “BLOCK B” labels or any headers.
-      • Do NOT write “Here is what I found”, “I could not fetch…”, or any conversational text.
+      • Do NOT write “Here is what I found…”, “I could not fetch…”, or any conversational text.
       • Do NOT explain errors, reasons, or this decision logic.
       • Start the output IMMEDIATELY with the first line of the selected block’s text.
       • The output must be raw text ready for copy-pasting to another AI.
@@ -703,47 +703,193 @@ steps:
       ALL TEXTS NEED TO BE IN GERMAN like the original source website
 
       IF GAPS: Extract missing information from original website.
+
       PRESERVATION APPROACH:
       Try to stay as close as possible to the original extracted texts, only do slight optimization that dont change the business personality but still improve the text quality where needed
       
+      OUTPUT:
+      Additional text content
 
+      CONTENT ENHANCEMENT (Design):
+      • Typography hierarchy improves readability
+      • Modern spacing improves scannability
+      • Strategic emphasis guides attention
+      • Professional formatting improves comprehension
+
+
+
+      PHASE 2: DESIGN INTELLIGENCE RESEARCH
       ═══════════════════════════════════════════════════════════════════
+
+      Research: "best website design concepts for this specific business.
+      Focus:
+      • Modern layout patterns and visual hierarchy
+      • Professional color psychology for this industry
+      • Typography that conveys expertise
+      • style standards
+
+      OUTPUT:
+      DESIGN RESEARCH:
+
+      Industry: [Specific industry]
+
+      Key Patterns Identified:
+      • Layout: [Grid systems, focal hierarchy]
+      • Color: [color psychology]
+      • Typography: [Font strategies]
+      • UX: [Navigation and conversion patterns]
+
+
+
+      PHASE 3: VISUAL DESIGN DNA CREATION
       ═══════════════════════════════════════════════════════════════════
+
+      This defines the unique visual identity for THIS business.
+
+      VISUAL CONCEPT INVENTION:
       ═══════════════════════════════════════════════════════════════════
+      Based on industry, brand voice, and positioning, create a unique 2-3 word visual concept that will guide ALL design decisions.
+      ❌ AVOID Generic: "Modern Professional", "Clean Minimal", "Bold Dynamic"
+      ✅ CREATE Business-Specific Concepts
+      THINKING EXAMPLES (To show diversity of approach—your business may not fit any of these):
+      These are NOT categories to choose from. They demonstrate how different business characteristics demand different visual strategies:
       * A heritage family restaurant might need: Warm, textured, grounded aesthetics (paper/wood feel, NOT glass/chrome)
       * A modern medical practice might need: Clean, precise, calming aesthetics (clarity and trust signals)
       * A traditional trade business might need: Bold, reliable, straightforward aesthetics (utility and strength)
       * A personal wellness service might need: Gentle, approachable, refined aesthetics (comfort and artistry)
       YOUR TASK: Analyze THIS specific business. What do THEY need? Don't force-fit into examples above.
+      CSS EFFECTS STRATEGY:
+      Modern CSS enables many visual approaches. Consider which effects reinforce THIS business's trust signals:
       * Depth & Layering: Glassmorphism (backdrop-blur), hard shadows (drop-shadow), subtle elevation (box-shadow), flat borders
       * Surface Quality: Texture overlays (noise), gradients (mesh/linear), solid colors, pattern backgrounds
       * Light & Glow: Neon effects (text-shadow, glow), soft halos, harsh spotlights, ambient diffusion
       * Motion & Transform: Parallax scrolling, hover lifts, smooth fades, instant snaps, spring animations
       * Shape & Form: Rounded corners, sharp edges, organic blobs, geometric grids, asymmetric layouts
+      APPROPRIATENESS CHECK:
       Analyze and self reflect over the given concept. Is it the best fit for the business from the PRD. 
       YOUR TASK: Analyze THIS business deeply. Select/combine CSS approaches that build trust and match their unique positioning. Think beyond the examples—what does THIS specific business need?
+      CONCEPT DEVELOPMENT:
       1. CONCEPT NAME: "[Your invented 2-3 word concept specific to THIS business]"
+      2. VISUAL INTERPRETATION:
+          * Atmosphere: [3 specific adjectives]
+          * Mood: [Emotional quality]
+          * Reference Analog: [Real-world physical object/space that captures this business's essence]
+      3. DESIGN MANIFESTATION:
+          * Spatial Strategy: [How space is used]
+          * Form Language: [Shape vocabulary]
+          * Depth Approach: [Specific CSS techniques you'll use and why they fit]
+          * Surface Treatment: [Textures, colors, gradients—describe the "material"]
+          * Motion Philosophy: [How elements move and why]
+
+
+
+      SPATIAL DESIGN:
       ═══════════════════════════════════════════════════════════════════
+
+
+      Grid: [e.g., "Asymmetric 12-col with golden ratio (8:5)"]
+      Composition: [e.g., "Diagonal energy flow top-right to bottom-left"]
+      White Space: [Generous / Balanced / Compact] - [Purpose for concept]
+      Hierarchy: [Primary focus] → [Secondary] → [Tertiary]
+
       these values are just examples, please think well what would be the best spatial design. 
+      RESPONSIVE STRATEGY:
+      Desktop (>1024px): [Strategy]
+      Tablet (640-1024px): [Transformation]
+      Mobile (<640px): [UNIQUE approach - NOT "stacks vertically"]
+
+
+      HERO VISUAL DESIGN APPROACH: (optional)
       ═══════════════════════════════════════════════════════════════════
+      Based on VISUAL CONCEPT INVENTION, describe the hero visual approach that AI coder can implement well
+      Be descriptive about "looks and feels" rather than code.
+
+      COMPOSITION CONCEPT:
+      Elements, Represents, Visual Style
+
+      MOBILE STRATEGY:
+
+      LOOKS & FEELS DESCRIPTION:
+      [2-3 sentences describing overall feel that AI code generator will understand]
+
+
+      PHASE 4: INTERACTIVE TOOL RECOMMENDATION (optional)
       ═══════════════════════════════════════════════════════════════════
       only create if fitting for the business
+      TOOL SELECTION:
+      Type: [Specific tool - e.g., "Project cost estimator"]
+      Problem Solved: [Customer question answered]
+      Lead Value: [How it captures and qualifies leads]
+
+      CORE FUNCTIONALITY:
+      Inputs: [List fields with types and purpose]
+      Logic: [How tool processes inputs]
+      Output: [What user receives]
+      Data Capture: [Customer info collected]
+
+      USER FLOW:
+      Tool page → User enters info → Results provided → Contact CTA
+
+      BUSINESS IMPACT:
+      Engagement | Qualification | Conversion | Expertise demonstration
+
+
+      PHASE 5: WEBSITE ARCHITECTURE
       ═══════════════════════════════════════════════════════════════════
 
       HOMEPAGE STRUCTURE:
       
       think of a ideal structure for this Business and  VISUAL CONCEPT INVENTION
+
+
+
+
+      FINAL PRD OUTPUT
       ═══════════════════════════════════════════════════════════════════
+
       ═══════════════════════════════════════════════════════════════════
+      PREMIUM WEBSITE REDESIGN PRD
+      [Business Name] - [Industry]
+      Visual Design Specifications
       ═══════════════════════════════════════════════════════════════════
+
+      EXECUTIVE SUMMARY
       ───────────────────────────────────────────────────────────────────
+      Business: [Name, URL, industry]
+      Objectives: [Visual excellence, modern design, content preservation]
+      Design Approach: [Concept Name] - concept-driven visual redesign
+      Current Issues: [From extraction assessment]
+
+      SECTION 1: VISUAL DESIGN DNA
+      ───────────────────────────────────────────────────────────────────
+      Visual Concept: [Complete concept invention]
+      Color Strategy: [Detailed color system]
+      Typography: [Font system with rationale]
+      Spatial Design: [Layout and responsive strategy]
+      Hero Visual: [Design approach and looks/feels]
+
+      SECTION 2: WEBSITE ARCHITECTURE
+      ───────────────────────────────────────────────────────────────────
+      Homepage: [Structure with exact content]
+      Services: [All offerings with descriptions]
+      About: [Company story and team]
+      Contact: [Information and form]
+      Whatever else that would be relevant for this business
+
+
+
+      SECTION 4: SUCCESS METRICS
+      ───────────────────────────────────────────────────────────────────
+      Visual Quality: [Premium appearance, brand perception]
+      Content completeness:
+
+      ═══════════════════════════════════════════════════════════════════
+
+      PREPARATION FOR DESIGN FRAMEWORK
       ───────────────────────────────────────────────────────────────────
 
-      ───────────────────────────────────────────────────────────────────
+      Prepare and Output the PRD in a way optimized for an AI like you to generate from it a prompt for an AI coder / Web App generator like lovable.dev`;
 
-      ───────────────────────────────────────────────────────────────────
-      ═══════════════════════════════════════════════════════════════════
-      ───────────────────────────────────────────────────────────────────
       const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
       if (!input) return { error: 'No input' };
       const setReactValue = (el, value) => {
@@ -782,6 +928,7 @@ steps:
       }
       return { finished: false, timedOut: true, waitedSeconds: waited };
     param: perplexityWait2
+
   # 5) Paste image extraction output into Perplexity
   - type: say
     message: Pasting image extraction output into Perplexity
@@ -801,7 +948,8 @@ steps:
       await new Promise(r => setTimeout(r, 500));
       setReactValue(input, text);
       return { success: Boolean(text), length: text.length };
-    args: imageOutput
+    args:
+      imageOutput: imageOutput
     param: perplexityPasteImages
   - type: js
     code: |
@@ -827,312 +975,393 @@ steps:
       }
       return { finished: false, timedOut: true, waitedSeconds: waited };
     param: perplexityWaitImages
+
   # 6) Lovable prompting framework (Phase 1) in Perplexity
   - type: say
     message: Submitting LOVABLE PROMPTING FRAMEWORK (Phase 1) to Perplexity
   - type: js
     code: |
       const prompt = `# LOVABLE PROMPTING FRAMEWORK
----
-## PURPOSE
-You are an AI Prompt Architect. You transform the Product Requirement Documents (PRDs) from this chat  into implementation prompts for Lovable.dev (the AI Coder). Your goal: generate prompts that communicate visual intent so clearly that the AI Coder creates stunning, premium-looking landing pages for local small businesses.
+      ---
+      ## PURPOSE
 
-**Your role:** Communicate design vision and content. Describe *what* and *why*.
-**AI Coder's role:** Implement the design. Decide *how*.
-**Output priorities:**
-1. Clear visual intent communication
-2. Complete content delivery
-3. Business authenticity (never invent facts)
-**Out of scope:** SEO, performance optimization, accessibility details, backend functionality.
-—
-## REASONING PROTOCOL (Internal Process)
-Before generating any output, complete this analysis internally:
-### PRD Completeness Audit
-Evaluate what the PRD provides and what requires inference:
-- Business identity: Name, industry, location, years established?
-- Content inventory: Services, testimonials, team info, contact details?
-- Visual direction: Brand colors, existing logo, style preferences?
-- Missing elements: What must be inferred vs. what must be excluded?
-### Industry Mental Model
-Draw on knowledge of the business type:
-- What visual conventions does this industry expect?
-- What would feel inappropriate or off-brand?
-- What emotional response should visitors have?
-### Visual Coherence Check
-Ensure your Four-Spectrum positioning, Visual Anchor, and design decisions align:
-- Does the metaphor match the spectrum values?
-- Would these colors/typography serve this industry?
-- Is there internal consistency across all design choices?
-### Content Authenticity Verification
-For each content element, verify:
-- Does this come directly from the PRD?
-- Am I inventing, assuming, or inferring?
-- If inferring: Is this a safe industry-standard inference or a specific claim?
-### Phase Distribution Planning
-Determine what belongs in each phase:
-- Phase 1: All foundational decisions + all content
-- Phase 2: Interaction refinements, motion polish, visual depth enhancements
-- Prepare internally to generate Phase 2 when requested
----
-## YOUR OUTPUT: TWO PROMPTS
-### Phase 1: Foundation + Content (2,000-2,800 words)
-- Complete visual concept and design intent
-- ALL text content in compressed appendix
-- Section structure and priorities
-- Basic animation character
-### Phase 2: Premium Polish (600-1,200 words)
-- Refinements based on Phase 1 result
-- NO content repetition
-- Enhancement requests only
-- Triggered after user reviews Phase 1 implementation
+      You are an AI Prompt Architect. You transform the Product Requirement Documents (PRDs) from this chat  into implementation prompts for Lovable.dev (the AI Coder). Your goal: generate prompts that communicate visual intent so clearly that the AI Coder creates stunning, premium-looking landing pages for local small businesses.
 
-**Phase 2 Awareness:** While generating Phase 1, internally prepare for Phase 2. Consider what premium enhancements would elevate the design (interactions, motion, visual depth) but exclude them from Phase 1. Output ONLY Phase 1 until explicitly asked for Phase 2.
+      **Your role:** Communicate design vision and content. Describe *what* and *why*.
+      **AI Coder's role:** Implement the design. Decide *how*.
 
----
-## VISUAL CONCEPT SYNTHESIS
-### Step 1: Four-Spectrum Positioning
-Analyze the PRD and position the design on these spectra (0-100%):
-| Spectrum | 0% | 100% | Industry Anchors |
-|----------|-----|------|------------------|
-| **Luminosity** | Dark, cinematic, moody | Bright, airy, open | Bar/Lounge: 20-30% · Bakery: 75-85% · Medical: 60-70% |
-| **Materiality** | Synthetic, glass, metal | Organic, paper, fabric | Tech: 15-25% · Florist: 80-90% · Restaurant: 50-70% |
-| **Temperature** | Cool, clinical, precise | Warm, welcoming, human | Law firm: 30-40% · Café: 75-85% · Spa: 60-70% |
-| **Shape Language** | Sharp, geometric, angular | Soft, rounded, flowing | Architecture: 10-20% · Childcare: 85-95% · Dental: 50-60% |
-Output format: `Luminosity 70% | Materiality 30% | Temperature 80% | Shape 60%`
+      **Output priorities:**
+      1. Clear visual intent communication
+      2. Complete content delivery
+      3. Business authenticity (never invent facts)
 
-### Step 2: Visual Anchor Metaphor
+      **Out of scope:** SEO, performance optimization, accessibility details, backend functionality.
 
-Create ONE rich sensory metaphor (15-25 words) that captures the entire design feeling. This single metaphor should implicitly convey color mood, spatial feeling, animation character, and emotional temperature.
-**Strong examples:**
-- "Morning light through frosted glass onto warm oak, steam rising from a ceramic cup"
-- "Crisp architectural blueprints on a lightbox, precise lines meeting soft shadows"
-- "Velvet dusk in a jazz lounge, brass accents catching amber light"
-- "Fresh linen on a sunlit porch, lavender breeze, weathered wood underfoot"
-- "Polished concrete gallery, single spotlight on brushed steel, deliberate silence"
-**Weak examples (avoid):**
-- "Modern and professional" *(too generic)*
-- "Blue website with cards" *(describes implementation, not feeling)*
-- "Clean and minimal" *(no sensory information)*
-### Step 3: Concept Name
-Generate a unique 2-3 word name that anchors all design decisions. This becomes the reference point for the entire project:
+      —
 
-Examples: `Ceramic Warmth` | `Alpine Clarity` | `Brass & Velvet` | `Clinical Precision` | `Coastal Morning` | `Workshop Heritage`
----
-## DESIGN COMMUNICATION
-### Color Intent
-Choose the approach that matches your PRD information:
-**Option A — Intent-based** *(when PRD has no brand colors):*
-> "Colors should feel like [reference your Visual Anchor]: warm ambers, soft creams, touches of brass"
-**Option B — Specific** *(when PRD provides brand colors):*
-```
-Primary: hsl(35, 80%, 50%) — warm amber
-Secondary: hsl(35, 30%, 95%) — soft cream  
-Accent: hsl(35, 60%, 35%) — deep brass
-```
-**Option C — Hybrid** *(when PRD has partial brand info):*
-> "Primary brand blue: hsl(210, 70%, 45%). Supporting palette should feel clinical but not cold — soft grays, touches of warm white."
-### Typography Intent
+      ## REASONING PROTOCOL (Internal Process)
 
-**Option A — Specific fonts:**
-> Display: Playfair Display | Body: Source Sans 3
+      Before generating any output, complete this analysis internally:
 
-**Option B — Character description:**
-> "Headlines should feel established and trustworthy — perhaps a refined serif. Body text clean and effortless to read."
-**When to use which:** Use specific fonts when the PRD mentions them, when you have strong industry conventions (law = serif, tech = geometric sans), or when the Visual Anchor strongly implies a type style. Use character description when the PRD is open-ended.
-### Animation Character
-Choose ONE word that describes how motion should feel throughout the site:
-- `subtle` — barely perceptible, professional restraint
-- `confident` — purposeful movement, clear intent
-- `gentle` — soft, eased, calming
-- `playful` — bouncy, energetic, delightful
-- `dramatic` — bold entrances, statement-making
-- `minimal` — almost none, content-focused
+      ### PRD Completeness Audit
+      Evaluate what the PRD provides and what requires inference:
+      - Business identity: Name, industry, location, years established?
+      - Content inventory: Services, testimonials, team info, contact details?
+      - Visual direction: Brand colors, existing logo, style preferences?
+      - Missing elements: What must be inferred vs. what must be excluded?
 
-### Image Direction
+      ### Industry Mental Model
+      Draw on knowledge of the business type:
+      - What visual conventions does this industry expect?
+      - What would feel inappropriate or off-brand?
+      - What emotional response should visitors have?
 
-Provide enough guidance for AI image generation or stock selection:
+      ### Visual Coherence Check
+      Ensure your Four-Spectrum positioning, Visual Anchor, and design decisions align:
+      - Does the metaphor match the spectrum values?
+      - Would these colors/typography serve this industry?
+      - Is there internal consistency across all design choices?
 
-```
-Subject: [What images should show — people at work, products in context, environment shots]
-Mood: [Emotional quality — warm, professional, energetic, calm, luxurious]
-Treatment: [Visual treatment — soft edges blending into background, high contrast, muted tones, film grain]
-Composition: [Optional — close-up details, wide environmental, portrait-style]
-```
----
-## CONTENT HANDLING
-### Core Rules
+      ### Content Authenticity Verification
+      For each content element, verify:
+      - Does this come directly from the PRD?
+      - Am I inventing, assuming, or inferring?
+      - If inferring: Is this a safe industry-standard inference or a specific claim?
 
-1. **Maximum content appendix: 1,500 words** — compress longer PRD content to fit
-2. **Never invent content** — if PRD lacks testimonials, awards, or years in business, exclude them entirely
-3. **Preserve all essential information** — compress wording, not meaning
-4. **Shorter PRDs don't need padding** — only include what exists
-5. **Mark inferences clearly** — if you must infer (e.g., standard business hours), note it
+      ### Phase Distribution Planning
+      Determine what belongs in each phase:
+      - Phase 1: All foundational decisions + all content
+      - Phase 2: Interaction refinements, motion polish, visual depth enhancements
+      - Prepare internally to generate Phase 2 when requested
 
-### Compression Approach
-Reduce verbose PRD content while preserving meaning. Use structured notation:
-```
-## HEADLINES
-H1: [Exact headline text]
-H2-hero: [Exact subheadline]
-H2-services: [Section headline]
-H2-about: [Section headline]
-## SERVICES
-S1: [Name] | [Core benefit, max 20 words] | [Price if provided]
-S2: [Name] | [Core benefit] | [Price]
-S3: [Name] | [Core benefit] | [Price]
-## ABOUT
-[Company story compressed to 40-60 words, preserving key facts]
-[Team info if provided: names, roles, brief bios]
-## TESTIMONIALS (only if real quotes exist in PRD)
-T1: "[Exact quote, max 30 words]" — [Name], [Role/Company]
-T2: "[Exact quote]" — [Name], [Role]
-## FAQ (if provided)
-Q1: [Question] → [Answer compressed to max 40 words]
-Q2: [Question] → [Answer]
+      ---
 
-## TRUST SIGNALS (only if real)
-- [Years in business — only if stated]
-- [Certifications — only if stated]
-- [Awards — only if stated]
-- [Client count — only if stated]
-## CONTACT
-Phone: [number]
-Email: [address]
-Address: [full address]
-Hours: [formatted] *[note if inferred from industry standard]*
+      ## YOUR OUTPUT: TWO PROMPTS
 
-## CTAs (in priority order)
-CTA1: [Button text] → [Action/destination]
-CTA2: [Button text] → [Action/destination]
-```
-**For content types not listed:** Create logical structured notation that preserves information hierarchy. Be consistent. The AI Coder will interpret any clear structure.
----
-## PHASE 1 PROMPT STRUCTURE
+      ### Phase 1: Foundation + Content (2,000-2,800 words)
+      - Complete visual concept and design intent
+      - ALL text content in compressed appendix
+      - Section structure and priorities
+      - Basic animation character
 
-```markdown
-# [BUSINESS NAME] — Phase 1: Foundation + Content
-## For Lovable.dev
----
-### Design Concept
-**Concept Name:** [2-3 word unique identifier]
-**Visual Anchor:** "[15-25 word sensory metaphor that captures the entire design feeling]"
-**Spectrum Position:** 
-Luminosity [X]% | Materiality [X]% | Temperature [X]% | Shape [X]%
----
+      ### Phase 2: Premium Polish (600-1,200 words)
+      - Refinements based on Phase 1 result
+      - NO content repetition
+      - Enhancement requests only
+      - Triggered after user reviews Phase 1 implementation
 
-### Design Intent
-**Colors:** [Intent description referencing Visual Anchor OR specific HSL values]
-**Typography:** [Font names OR character description]
-**Animation Character:** [single word]
-**Image Direction:**
-- Subject: [description]
-- Mood: [description]
-- Treatment: [description]
----
-### Page Configuration
-**Industry:** [specific business type]
-**Mobile Priority:** [desktop-primary | mobile-primary | balanced]
-**Page Depth:** [compact: 3-4 sections | standard: 5-6 sections | comprehensive: 7+]
----
-### Section Priority
-1. **[CRITICAL] Hero** — [specific requirements, key message]
-2. **[CRITICAL] Services** — [number of services, display approach]
-3. **[HIGH] Contact** — [what contact methods to emphasize]
-4. **[MEDIUM] About** — [what story to tell]
-5. **[LOW/OPTIONAL] FAQ** — [if included, why]
----
-### Special Requirements
-[Any unique constraints, must-haves, or specific requests from the PRD]
-[Unusual features or functionality needed]
-[Things to specifically avoid if mentioned in PRD]
----
-## CONTENT APPENDIX
-[All compressed content using structured notation above]
-[Maximum 1,500 words]
-[Only real content from PRD — never invented]
+      **Phase 2 Awareness:** While generating Phase 1, internally prepare for Phase 2. Consider what premium enhancements would elevate the design (interactions, motion, visual depth) but exclude them from Phase 1. Output ONLY Phase 1 until explicitly asked for Phase 2.
 
----
-**Implementation Instruction:**
-Build this landing page as a single-page React application. Reference the Visual Anchor "[Concept Name]" for all aesthetic decisions. The design should feel like: "[repeat the Visual Anchor metaphor]"
+      ---
 
-```
+      ## VISUAL CONCEPT SYNTHESIS
 
----
-## TRUST THE AI CODER
-The AI Coder (Lovable.dev) handles these automatically and well. Do NOT specify:
-| ❌ Don't Specify | ✅ Instead Communicate |
-|------------------|------------------------|
-| Exact pixel values, spacing numbers | "Generous whitespace" / "Intimate, cozy spacing" |
-| Animation timings, easing curves | "Confident motion" / "Gentle, subtle movement" |
-| Z-index values, layering details | "Cards should feel elevated, floating above" |
-| Responsive breakpoint specifics | "Mobile-first" or "Desktop-primary" |
-| Icon selections | "Icon representing [purpose]" |
-| Shadow values, blur amounts | "Soft shadow suggesting depth" / "Grounded, minimal shadow" |
-| Grid column counts, flexbox code | "Magazine-style layout" / "Card grid" |
-| Hex codes, RGB values | HSL values or color intent descriptions |
-**The principle:** Describe the *feeling* and *intent*. Trust implementation details to the AI Coder.
----
-## PRE-OUTPUT VERIFICATION
-Before outputting Phase 1, verify internally:
-### Design Communication
-- [ ] Visual Anchor is a rich sensory metaphor (15-25 words, not generic)
-- [ ] Four-spectrum values assigned and consistent with metaphor
-- [ ] Animation character is ONE word that fits the concept
-- [ ] Color intent is clear and matches Visual Anchor mood
+      ### Step 1: Four-Spectrum Positioning
 
-### Content Integrity  
-- [ ] ALL content comes directly from PRD
-- [ ] NO invented testimonials, awards, statistics, or years in business
-- [ ] Content appendix ≤ 1,500 words
-- [ ] Headlines preserved exactly, not paraphrased
-- [ ] Inferences marked clearly where made
-### Structure
-- [ ] Sections prioritized with CRITICAL/HIGH/MEDIUM/LOW
-- [ ] Mobile priority specified based on industry/audience
-- [ ] Page depth matches PRD scope (don't add sections for content that doesn't exist)
+      Analyze the PRD and position the design on these spectra (0-100%):
 
-### Phase 2 Readiness
-- [ ] Visual Anchor can be referenced consistently in Phase 2
-- [ ] No implementation details specified that would conflict with polish phase
-- [ ] Premium enhancements identified internally for Phase 2 generation
+      | Spectrum | 0% | 100% | Industry Anchors |
+      |----------|-----|------|------------------|
+      | **Luminosity** | Dark, cinematic, moody | Bright, airy, open | Bar/Lounge: 20-30% · Bakery: 75-85% · Medical: 60-70% |
+      | **Materiality** | Synthetic, glass, metal | Organic, paper, fabric | Tech: 15-25% · Florist: 80-90% · Restaurant: 50-70% |
+      | **Temperature** | Cool, clinical, precise | Warm, welcoming, human | Law firm: 30-40% · Café: 75-85% · Spa: 60-70% |
+      | **Shape Language** | Sharp, geometric, angular | Soft, rounded, flowing | Architecture: 10-20% · Childcare: 85-95% · Dental: 50-60% |
 
----
+      Output format: \`Luminosity 70% | Materiality 30% | Temperature 80% | Shape 60%\`
+
+      ### Step 2: Visual Anchor Metaphor
+
+      Create ONE rich sensory metaphor (15-25 words) that captures the entire design feeling. This single metaphor should implicitly convey color mood, spatial feeling, animation character, and emotional temperature.
+
+      **Strong examples:**
+      - "Morning light through frosted glass onto warm oak, steam rising from a ceramic cup"
+      - "Crisp architectural blueprints on a lightbox, precise lines meeting soft shadows"
+      - "Velvet dusk in a jazz lounge, brass accents catching amber light"
+      - "Fresh linen on a sunlit porch, lavender breeze, weathered wood underfoot"
+      - "Polished concrete gallery, single spotlight on brushed steel, deliberate silence"
+
+      **Weak examples (avoid):**
+      - "Modern and professional" *(too generic)*
+      - "Blue website with cards" *(describes implementation, not feeling)*
+      - "Clean and minimal" *(no sensory information)*
+
+      ### Step 3: Concept Name
+
+      Generate a unique 2-3 word name that anchors all design decisions. This becomes the reference point for the entire project:
+
+      Examples: \`Ceramic Warmth\` | \`Alpine Clarity\` | \`Brass & Velvet\` | \`Clinical Precision\` | \`Coastal Morning\` | \`Workshop Heritage\`
+
+      ---
+
+      ## DESIGN COMMUNICATION
+
+      ### Color Intent
+
+      Choose the approach that matches your PRD information:
+
+      **Option A — Intent-based** *(when PRD has no brand colors):*
+      > "Colors should feel like [reference your Visual Anchor]: warm ambers, soft creams, touches of brass"
+
+      **Option B — Specific** *(when PRD provides brand colors):*
+      \`\`\`
+      Primary: hsl(35, 80%, 50%) — warm amber
+      Secondary: hsl(35, 30%, 95%) — soft cream
+      Accent: hsl(35, 60%, 35%) — deep brass
+      \`\`\`
+
+      **Option C — Hybrid** *(when PRD has partial brand info):*
+      > "Primary brand blue: hsl(210, 70%, 45%). Supporting palette should feel clinical but not cold — soft grays, touches of warm white."
+
+      ### Typography Intent
+
+      **Option A — Specific fonts:**
+      > Display: Playfair Display | Body: Source Sans 3
+
+      **Option B — Character description:**
+      > "Headlines should feel established and trustworthy — perhaps a refined serif. Body text clean and effortless to read."
+
+      **When to use which:** Use specific fonts when the PRD mentions them, when you have strong industry conventions (law = serif, tech = geometric sans), or when the Visual Anchor strongly implies a type style. Use character description when the PRD is open-ended.
+
+      ### Animation Character
+
+      Choose ONE word that describes how motion should feel throughout the site:
+      - \`subtle\` — barely perceptible, professional restraint
+      - \`confident\` — purposeful movement, clear intent
+      - \`gentle\` — soft, eased, calming
+      - \`playful\` — bouncy, energetic, delightful
+      - \`dramatic\` — bold entrances, statement-making
+      - \`minimal\` — almost none, content-focused
+
+      ### Image Direction
+
+      Provide enough guidance for AI image generation or stock selection:
+
+      \`\`\`
+      Subject: [What images should show — people at work, products in context, environment shots]
+      Mood: [Emotional quality — warm, professional, energetic, calm, luxurious]
+      Treatment: [Visual treatment — soft edges blending into background, high contrast, muted tones, film grain]
+      Composition: [Optional — close-up details, wide environmental, portrait-style]
+      \`\`\`
+
+      ---
+
+      ## CONTENT HANDLING
+
+      ### Core Rules
+
+      1. **Maximum content appendix: 1,500 words** — compress longer PRD content to fit
+      2. **Never invent content** — if PRD lacks testimonials, awards, or years in business, exclude them entirely
+      3. **Preserve all essential information** — compress wording, not meaning
+      4. **Shorter PRDs don't need padding** — only include what exists
+      5. **Mark inferences clearly** — if you must infer (e.g., standard business hours), note it
+
+      ### Compression Approach
+
+      Reduce verbose PRD content while preserving meaning. Use structured notation:
+
+      \`\`\`
+      ## HEADLINES
+      H1: [Exact headline text]
+      H2-hero: [Exact subheadline]
+      H2-services: [Section headline]
+      H2-about: [Section headline]
+
+      ## SERVICES
+      S1: [Name] | [Core benefit, max 20 words] | [Price if provided]
+      S2: [Name] | [Core benefit] | [Price]
+      S3: [Name] | [Core benefit] | [Price]
+
+      ## ABOUT
+      [Company story compressed to 40-60 words, preserving key facts]
+      [Team info if provided: names, roles, brief bios]
+
+      ## TESTIMONIALS (only if real quotes exist in PRD)
+      T1: "[Exact quote, max 30 words]" — [Name], [Role/Company]
+      T2: "[Exact quote]" — [Name], [Role]
+
+      ## FAQ (if provided)
+      Q1: [Question] → [Answer compressed to max 40 words]
+      Q2: [Question] → [Answer]
+
+      ## TRUST SIGNALS (only if real)
+      - [Years in business — only if stated]
+      - [Certifications — only if stated]
+      - [Awards — only if stated]
+      - [Client count — only if stated]
+
+      ## CONTACT
+      Phone: [number]
+      Email: [address]
+      Address: [full address]
+      Hours: [formatted] *[note if inferred from industry standard]*
+
+      ## CTAs (in priority order)
+      CTA1: [Button text] → [Action/destination]
+      CTA2: [Button text] → [Action/destination]
+      \`\`\`
+
+      **For content types not listed:** Create logical structured notation that preserves information hierarchy. Be consistent. The AI Coder will interpret any clear structure.
+
+      ---
+
+      ## PHASE 1 PROMPT STRUCTURE
+
+      \`\`\`markdown
+      # [BUSINESS NAME] — Phase 1: Foundation + Content
+      ## For Lovable.dev
+
+      ---
+
+      ### Design Concept
+
+      **Concept Name:** [2-3 word unique identifier]
+
+      **Visual Anchor:** "[15-25 word sensory metaphor that captures the entire design feeling]"
+
+      **Spectrum Position:**
+      Luminosity [X]% | Materiality [X]% | Temperature [X]% | Shape [X]%
+
+      ---
+
+      ### Design Intent
+
+      **Colors:** [Intent description referencing Visual Anchor OR specific HSL values]
+
+      **Typography:** [Font names OR character description]
+
+      **Animation Character:** [single word]
+
+      **Image Direction:**
+      - Subject: [description]
+      - Mood: [description]
+      - Treatment: [description]
+
+      ---
+
+      ### Page Configuration
+
+      **Industry:** [specific business type]
+      **Mobile Priority:** [desktop-primary | mobile-primary | balanced]
+      **Page Depth:** [compact: 3-4 sections | standard: 5-6 sections | comprehensive: 7+]
+
+      ---
+
+      ### Section Priority
+
+      1. **[CRITICAL] Hero** — [specific requirements, key message]
+      2. **[CRITICAL] Services** — [number of services, display approach]
+      3. **[HIGH] Contact** — [what contact methods to emphasize]
+      4. **[MEDIUM] About** — [what story to tell]
+      5. **[LOW/OPTIONAL] FAQ** — [if included, why]
+
+      ---
+
+      ### Special Requirements
+
+      [Any unique constraints, must-haves, or specific requests from the PRD]
+      [Unusual features or functionality needed]
+      [Things to specifically avoid if mentioned in PRD]
+
+      ---
+
+      ## CONTENT APPENDIX
+
+      [All compressed content using structured notation above]
+      [Maximum 1,500 words]
+      [Only real content from PRD — never invented]
+
+      ---
+
+      **Implementation Instruction:**
+      Build this landing page as a single-page React application. Reference the Visual Anchor "[Concept Name]" for all aesthetic decisions. The design should feel like: "[repeat the Visual Anchor metaphor]"
+
+      \`\`\`
+
+      ---
+
+      ## TRUST THE AI CODER
+
+      The AI Coder (Lovable.dev) handles these automatically and well. Do NOT specify:
+
+      | ❌ Don't Specify | ✅ Instead Communicate |
+      |------------------|------------------------|
+      | Exact pixel values, spacing numbers | "Generous whitespace" / "Intimate, cozy spacing" |
+      | Animation timings, easing curves | "Confident motion" / "Gentle, subtle movement" |
+      | Z-index values, layering details | "Cards should feel elevated, floating above" |
+      | Responsive breakpoint specifics | "Mobile-first" or "Desktop-primary" |
+      | Icon selections | "Icon representing [purpose]" |
+      | Shadow values, blur amounts | "Soft shadow suggesting depth" / "Grounded, minimal shadow" |
+      | Grid column counts, flexbox code | "Magazine-style layout" / "Card grid" |
+      | Hex codes, RGB values | HSL values or color intent descriptions |
+
+      **The principle:** Describe the *feeling* and *intent*. Trust implementation details to the AI Coder.
+
+      ---
+
+      ## PRE-OUTPUT VERIFICATION
+
+      Before outputting Phase 1, verify internally:
+
+      ### Design Communication
+      - [ ] Visual Anchor is a rich sensory metaphor (15-25 words, not generic)
+      - [ ] Four-spectrum values assigned and consistent with metaphor
+      - [ ] Animation character is ONE word that fits the concept
+      - [ ] Color intent is clear and matches Visual Anchor mood
+
+      ### Content Integrity
+      - [ ] ALL content comes directly from PRD
+      - [ ] NO invented testimonials, awards, statistics, or years in business
+      - [ ] Content appendix ≤ 1,500 words
+      - [ ] Headlines preserved exactly, not paraphrased
+      - [ ] Inferences marked clearly where made
+
+      ### Structure
+      - [ ] Sections prioritized with CRITICAL/HIGH/MEDIUM/LOW
+      - [ ] Mobile priority specified based on industry/audience
+      - [ ] Page depth matches PRD scope (don't add sections for content that doesn't exist)
+
+      ### Phase 2 Readiness
+      - [ ] Visual Anchor can be referenced consistently in Phase 2
+      - [ ] No implementation details specified that would conflict with polish phase
+      - [ ] Premium enhancements identified internally for Phase 2 generation
+
+      ---
 
 
-## QUICK REFERENCE
+      ## QUICK REFERENCE
 
-| Decision | Communicate | Don't Specify |
-|----------|-------------|---------------|
-| Colors | "Warm amber tones" or HSL | Hex codes, RGB, specific Tailwind classes |
-| Spacing | "Generous", "Intimate", "Breathing room" | px, rem, gap-4, specific values |
-| Animation | "Confident", "Subtle", "Gentle" | Durations, easing functions, keyframes |
-| Layout | "Magazine-style", "Cards feel elevated" | Grid columns, flexbox properties |
-| Typography | Font names or "Trustworthy, refined" | Font sizes, line heights, weights |
-| Shadows | "Elevated", "Floating", "Grounded" | Shadow-lg, blur values, opacity |
-| Images | "Soft edges into background" | Specific gradients, mask code |
+      | Decision | Communicate | Don't Specify |
+      |----------|-------------|---------------|
+      | Colors | "Warm amber tones" or HSL | Hex codes, RGB, specific Tailwind classes |
+      | Spacing | "Generous", "Intimate", "Breathing room" | px, rem, gap-4, specific values |
+      | Animation | "Confident", "Subtle", "Gentle" | Durations, easing functions, keyframes |
+      | Layout | "Magazine-style", "Cards feel elevated" | Grid columns, flexbox properties |
+      | Typography | Font names or "Trustworthy, refined" | Font sizes, line heights, weights |
+      | Shadows | "Elevated", "Floating", "Grounded" | Shadow-lg, blur values, opacity |
+      | Images | "Soft edges into background" | Specific gradients, mask code |
 
----
+      ---
 
-## EXECUTION
+      ## EXECUTION
 
-**Based on the PRD from this Chat:**
+      **Based on the PRD from this Chat:**
 
-1. Complete the Reasoning Protocol internally
-2. Synthesize the Visual Concept (spectrum + metaphor + name)
-3. Determine design communication approach based on PRD completeness
-4. Compress all content preserving meaning and authenticity
-5. Verify against Pre-Output checklist
-6. Output Phase 1 prompt only
-7. Await user request for Phase 2
+      1. Complete the Reasoning Protocol internally
+      2. Synthesize the Visual Concept (spectrum + metaphor + name)
+      3. Determine design communication approach based on PRD completeness
+      4. Compress all content preserving meaning and authenticity
+      5. Verify against Pre-Output checklist
+      6. Output Phase 1 prompt only
+      7. Await user request for Phase 2
 
-**Output Phase 1 immediately. Make informed inferences for industry conventions. Never invent business facts. Trust the AI Coder to implement your vision brilliantly.**
+      **Output Phase 1 immediately. Make informed inferences for industry conventions. Never invent business facts. Trust the AI Coder to implement your vision brilliantly.**
 
----
+      ---
 
-Optimized for AI Prompter → AI Coder communication
-*Phase 1 target: 2,300-2,900 words | Phase 2 target: 900-1,300 words | Content appendix max: 1,500 words*
+      Optimized for AI Prompter → AI Coder communication
+      *Phase 1 target: 2,300-2,900 words | Phase 2 target: 900-1,300 words | Content appendix max: 1,500 words*
 
----`;
+      ---`;
 
       const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
       if (!input) return { error: 'No input' };
@@ -1151,7 +1380,7 @@ Optimized for AI Prompter → AI Coder communication
   - type: js
     code: |
       const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
-      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      if (btn && !btn.disabled) { btn.click(); return { success: true, method: 'button' }; }
       const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
       if (input) {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
@@ -1169,7 +1398,10 @@ Optimized for AI Prompter → AI Coder communication
         const stop = document.querySelector('button[aria-label*="Stop"]');
         const textarea = document.querySelector('textarea#chatinput, textarea');
         if (!stop && textarea) return { finished: true, waitedSeconds: waited };
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
     param: perplexityWait3
+  - type: js
     code: |
       const latestMessage = Array.from(
         document.querySelectorAll('[data-message-author-role="assistant"], article')
@@ -1180,61 +1412,84 @@ Optimized for AI Prompter → AI Coder communication
     param: frameworkOutput
 
   # 7) Phase 2 trigger prompt in Perplexity
+  - type: say
     message: Submitting Phase 2 trigger prompt to Perplexity
+  - type: js
+    code: |
       const prompt = `# PHASE 2 TRIGGER PROMPT
----
-## Generate Phase 2: Premium Polish
-You previously generated a Phase 1 prompt for the Business from the PRD using the your design concept. The user has reviewed the implementation and is ready for the premium polish phase.
 
-### Your Task
-Generate the Phase 2 prompt that elevates the existing implementation. Phase 2 focuses on:
+      ---
 
-**Interaction & Motion**
-- Enhanced hover states (micro-interactions that feel alive)
-- Scroll-triggered animations (elements revealing with purpose)
-- State transitions (smooth, intentional feedback)
-**Visual Depth**
-- Layering and dimensional effects
-- Background visual interest (subtle patterns, gradients, atmospheric elements)  
-- Image integration refinements (soft edges, blending, contextual placement)
+      ## Generate Phase 2: Premium Polish
 
-**Delightful Details**
-- Moments of unexpected polish that elevate perception
-- Details that make the site feel crafted, not templated
-- Small touches aligned with the Visual Anchor mood
-### Phase 2 Rules
-1. **Reference, don't redefine** — Use the existing Concept Name and Visual Anchor. Don't re-explain the design system.
+      You previously generated a Phase 1 prompt for the Business from the PRD using the your design concept. The user has reviewed the implementation and is ready for the premium polish phase.
 
-2. **Enhance, don't rebuild** — No structural changes, no new sections, no content changes.
+      ### Your Task
 
-3. **Specific but not prescriptive** — Describe what interactions should *feel like*, not exact implementation code.
-4. **Prioritize impact** — Focus on 3-5 high-impact enhancements rather than exhaustive lists.
-5. **Stay on-brand** — All enhancements must feel consistent with the Visual Anchor metaphor.
-### Phase 2 Output Format
-```markdown
-# [BUSINESS NAME] — Phase 2: Premium Polish
-## Enhancing "[Concept Name]"
-### Interaction Enhancements
-[2-3 specific interaction improvements with intent descriptions]
-### Motion Refinements  
-[2-3 animation enhancements that add life and purpose]
-### Visual Depth Additions
-[1-2 layering or atmospheric enhancements]
+      Generate the Phase 2 prompt that elevates the existing implementation. Phase 2 focuses on:
 
-### Detail Polish
-[1-2 small delightful touches]
----
-Refine the existing implementation with these enhancements. 
-Maintain the "[Visual Anchor metaphor]" feeling throughout.
-Do not change structure or content — only elevate the craft.
-```
-### Anti-Patterns (Avoid)
-- ❌ Repeating any content from Phase 1
-- ❌ Suggesting structural changes or new sections
-- ❌ Specifying exact CSS values or animation timings
-- ❌ Generic requests ("make it more modern")
-- ❌ Changes that contradict the Visual Anchor mood
-**Generate the Phase 2 prompt now, building on the established Design foundation established in Phase 1.**`;
+      **Interaction & Motion**
+      - Enhanced hover states (micro-interactions that feel alive)
+      - Scroll-triggered animations (elements revealing with purpose)
+      - State transitions (smooth, intentional feedback)
+
+      **Visual Depth**
+      - Layering and dimensional effects
+      - Background visual interest (subtle patterns, gradients, atmospheric elements)
+      - Image integration refinements (soft edges, blending, contextual placement)
+
+      **Delightful Details**
+      - Moments of unexpected polish that elevate perception
+      - Details that make the site feel crafted, not templated
+      - Small touches aligned with the Visual Anchor mood
+
+      ### Phase 2 Rules
+
+      1. **Reference, don't redefine** — Use the existing Concept Name and Visual Anchor. Don't re-explain the design system.
+
+      2. **Enhance, don't rebuild** — No structural changes, no new sections, no content changes.
+
+      3. **Specific but not prescriptive** — Describe what interactions should *feel like*, not exact implementation code.
+
+      4. **Prioritize impact** — Focus on 3-5 high-impact enhancements rather than exhaustive lists.
+
+      5. **Stay on-brand** — All enhancements must feel consistent with the Visual Anchor metaphor.
+
+      ### Phase 2 Output Format
+
+      \`\`\`markdown
+      # [BUSINESS NAME] — Phase 2: Premium Polish
+      ## Enhancing "[Concept Name]"
+
+      ### Interaction Enhancements
+      [2-3 specific interaction improvements with intent descriptions]
+
+      ### Motion Refinements
+      [2-3 animation enhancements that add life and purpose]
+
+      ### Visual Depth Additions
+      [1-2 layering or atmospheric enhancements]
+
+      ### Detail Polish
+      [1-2 small delightful touches]
+
+      ---
+
+      Refine the existing implementation with these enhancements.
+      Maintain the "[Visual Anchor metaphor]" feeling throughout.
+      Do not change structure or content — only elevate the craft.
+      \`\`\`
+
+      ### Anti-Patterns (Avoid)
+
+      - ❌ Repeating any content from Phase 1
+      - ❌ Suggesting structural changes or new sections
+      - ❌ Specifying exact CSS values or animation timings
+      - ❌ Generic requests ("make it more modern")
+      - ❌ Changes that contradict the Visual Anchor mood
+
+      **Generate the Phase 2 prompt now, building on the established Design foundation established in Phase 1.**`;
+
       const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
       if (!input) return { error: 'No input' };
       const setReactValue = (el, value) => {
@@ -1252,18 +1507,26 @@ Do not change structure or content — only elevate the craft.
   - type: js
     code: |
       const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
-      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      if (btn && !btn.disabled) { btn.click(); return { success: true, method: 'button' }; }
       const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
       if (input) {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
         return { success: true, method: 'enter' };
+      }
       return { error: 'No send' };
     param: perplexitySend4
+  - type: js
+    code: |
+      const maxWait = 600;
+      let waited = 0;
+      while (waited < maxWait) {
         await new Promise(r => setTimeout(r, 3000));
         waited += 3;
         const stop = document.querySelector('button[aria-label*="Stop"]');
         const textarea = document.querySelector('textarea#chatinput, textarea');
         if (!stop && textarea) return { finished: true, waitedSeconds: waited };
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
     param: perplexityWait4
   - type: js
     code: |
@@ -1276,14 +1539,19 @@ Do not change structure or content — only elevate the craft.
     param: phase2Output
 
   # 8) Open Lovable.dev and submit framework output
+  - type: say
     message: Opening Lovable.dev and submitting Phase 1 prompt
   - type: navigate
     url: https://lovable.dev/
     waitForIdle: true
+  - type: wait
     timeout: 8000
+    for: idle
+  - type: js
     code: |
       const text = (args.frameworkOutput && args.frameworkOutput.copiedText) || '';
       const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input found' };
       const setReactValue = (el, value) => {
         const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
         const setter = desc && desc.set;
@@ -1291,13 +1559,17 @@ Do not change structure or content — only elevate the craft.
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
       };
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
       setReactValue(input, text);
       return { success: Boolean(text), length: text.length };
-    args: frameworkOutput
+    args:
+      frameworkOutput: frameworkOutput
     param: lovablePaste1
+  - type: js
     code: |
       const btn = document.querySelector('button#chatinput-send-message-button, button[aria-label*="Send"], form button');
-      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      if (btn && !btn.disabled) { btn.click(); return { success: true, method: 'button' }; }
       const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
       if (input) {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
@@ -1305,14 +1577,29 @@ Do not change structure or content — only elevate the craft.
       }
       return { error: 'No send' };
     param: lovableSend1
+  - type: js
+    code: |
+      const maxWait = 600;
       const checkInterval = 5;
+      let waited = 0;
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
+        const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
+        const textarea = document.querySelector('textarea#chatinput');
         if (thumbsUpButton && textarea) return { finished: true, waitedSeconds: waited };
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
     param: lovableWait1
 
   # 9) Submit Phase 2 prompt in Lovable
+  - type: say
     message: Submitting Phase 2 prompt in Lovable
+  - type: js
+    code: |
       const text = (args.phase2Output && args.phase2Output.copiedText) || '';
       const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input found' };
       const setReactValue = (el, value) => {
         const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
         const setter = desc && desc.set;
@@ -1320,11 +1607,17 @@ Do not change structure or content — only elevate the craft.
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
       };
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
       setReactValue(input, text);
-    args: phase2Output
+      return { success: Boolean(text), length: text.length };
+    args:
+      phase2Output: phase2Output
     param: lovablePaste2
+  - type: js
+    code: |
       const btn = document.querySelector('button#chatinput-send-message-button, button[aria-label*="Send"], form button');
-      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      if (btn && !btn.disabled) { btn.click(); return { success: true, method: 'button' }; }
       const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
       if (input) {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
@@ -1332,17 +1625,35 @@ Do not change structure or content — only elevate the craft.
       }
       return { error: 'No send' };
     param: lovableSend2
+  - type: js
+    code: |
+      const maxWait = 600;
       const checkInterval = 5;
+      let waited = 0;
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
         const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
+        const textarea = document.querySelector('textarea#chatinput');
         if (thumbsUpButton && textarea) return { finished: true, waitedSeconds: waited };
+      }
       return { finished: false, timedOut: true, waitedSeconds: waited };
     param: lovableWait2
+  - type: js
     code: |
       return { url: window.location.href };
     param: lovableEditorUrl
+
   # 10) Post Lovable editor URL back to Perplexity chat
+  - type: say
     message: Returning Lovable editor URL to Perplexity
+  - type: navigate
     url: "{{perplexityChatUrl.url}}"
+    waitForIdle: true
+  - type: wait
+    timeout: 5000
+    for: idle
+  - type: js
     code: |
       const text = `Lovable editor URL: ${args.lovableEditorUrl && args.lovableEditorUrl.url ? args.lovableEditorUrl.url : window.location.href}`;
       const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
@@ -1354,11 +1665,14 @@ Do not change structure or content — only elevate the craft.
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
       };
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
       setReactValue(input, text);
       return { success: true, textLength: text.length };
     args:
       lovableEditorUrl: lovableEditorUrl
     param: perplexityReturnUrl
+  - type: js
     code: |
       const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
       if (btn && !btn.disabled) { btn.click(); return { success: true } }
@@ -1366,334 +1680,10 @@ Do not change structure or content — only elevate the craft.
       if (input) {
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
         return { success: true, method: 'enter' };
+      }
       return { error: 'No send' };
     param: perplexitySendUrl
-    message: Pasting ChatGPT image prompt into Lovable
-  - type: js
-    code: |
-      const text = (args.chatgptOutput && args.chatgptOutput.copiedText) || '';
 
-      await new Promise(r => setTimeout(r, 2000));
-
-      const input = document.querySelector('textarea#chatinput');
-
-      if (!input) return { error: 'No input found' };
-
-      input.focus();
-
-      await new Promise(r => setTimeout(r, 1000));
-
-      const nativeInputValueSetter =
-        Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-
-      nativeInputValueSetter.call(input, text);
-
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-
-      await new Promise(r => setTimeout(r, 500));
-
-      return { success: Boolean(text), length: text.length };
-    args: chatgptOutput
-    param: lovablePasteChatgpt
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: say
-    message: Submitting ChatGPT image prompt
-  - type: js
-    code: |
-      await new Promise(r => setTimeout(r, 1000));
-
-      const btn = document.querySelector('button#chatinput-send-message-button');
-
-      if (!btn || btn.disabled) return { error: 'Button not ready' };
-
-      btn.click();
-
-      await new Promise(r => setTimeout(r, 1000));
-
-      return { success: true };
-    param: lovableSubmit3
-  - type: say
-    message: Waiting for ChatGPT prompt generation
-  - type: js
-    code: |
-      const maxWait = 600;
-      let waited = 0;
-      const checkInterval = 3;
-      let generationStarted = false;
-
-      while (waited < maxWait) {
-        await new Promise(r => setTimeout(r, checkInterval * 1000));
-        waited += checkInterval;
-
-        const stopBtn = document.querySelector('button[aria-label*="Stop"]');
-        const textarea = document.querySelector('textarea#chatinput');
-        const button = document.querySelector('button#chatinput-send-message-button');
-
-        const textareaReady = textarea && !textarea.disabled;
-        const buttonExists = !!button;
-        const buttonDisabled = button && button.disabled;
-
-        if (stopBtn || buttonDisabled) {
-          generationStarted = true;
-        }
-
-        if (generationStarted && !stopBtn && textareaReady && buttonExists && !buttonDisabled) {
-          return { finished: true, waitedSeconds: waited, generationStarted };
-        }
-
-        if (waited % 15 === 0) {
-          console.log('Still generating ChatGPT prompt...', waited, 'seconds');
-        }
-      }
-      return { finished: false, timedOut: true, waitedSeconds: waited, generationStarted };
-    param: lovableWait3
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: say
-    message: Extracting links
-  - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 3000));
-
-
-      const editor = window.location.href;
-
-      console.log('Editor URL:', editor);
-
-
-      let preview = '';
-
-
-      const previewSvg = document.querySelector('svg.shrink-0.h-4.w-4[viewBox="0
-      0 24 24"]');
-
-      if (previewSvg) {
-        let parent = previewSvg.parentElement;
-        let attempts = 0;
-        while (parent && attempts < 10) {
-          if (parent.tagName === 'A' && parent.href) {
-            preview = parent.href;
-            console.log('Found preview via SVG parent:', preview);
-            break;
-          }
-          parent = parent.parentElement;
-          attempts++;
-        }
-      }
-
-
-      if (!preview) {
-        const allLinks = document.querySelectorAll('a[href]');
-        for (const link of allLinks) {
-          const title = link.getAttribute('title');
-          const ariaLabel = link.getAttribute('aria-label');
-          if (title && title.includes('preview') || ariaLabel && ariaLabel.includes('preview')) {
-            preview = link.href;
-            console.log('Found preview via tooltip:', preview);
-            break;
-          }
-        }
-      }
-
-
-      if (!preview) {
-        const allLinks = document.querySelectorAll('a[href]');
-        for (const link of allLinks) {
-          if (link.href && /preview.*\.lovable\.app/.test(link.href)) {
-            preview = link.href;
-            console.log('Found preview via URL pattern:', preview);
-            break;
-          }
-        }
-      }
-
-
-      if (!preview) {
-        const urlInput = document.querySelector('input#preview-url-bar');
-        if (urlInput && urlInput.value) {
-          const value = urlInput.value;
-          if (value.startsWith('http')) {
-            preview = value;
-          } else {
-            const baseLinkMatch = editor.match(/(https:\/\/[^\/]+)/);
-            if (baseLinkMatch) {
-              preview = value.startsWith('/') ? baseLinkMatch[1] + value : value;
-            }
-          }
-          console.log('Found preview via input field:', preview);
-        }
-      }
-
-
-      if (!preview) {
-        preview = 'Preview link not found - check Lovable manually';
-        console.log('Could not find preview link');
-      }
-
-
-      return { editorUrl: editor, previewUrl: preview, success: true };
-    param: lovableLinks
-  - type: say
-    message: Links captured
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: say
-    message: Returning to Perplexity
-  - type: navigate
-    url: '{{finalChatUrl}}'
-    waitForIdle: true
-  - type: wait
-    timeout: 5000
-    for: idle
-  - type: say
-    message: Sending data collection
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: js
-    code: >
-      const editor = args.lovableLinks.editorUrl;
-
-      const preview = args.lovableLinks.previewUrl;
-
-      const prompt = 'You are completing website redesign automation. Analysis
-      and Lovable creation complete. Extract and format key data. LOVABLE LINKS:
-      Editor ' + editor + ' Preview ' + preview + ' TASK: Generate single TSV
-      row with 11 columns in exact order: 1. Business name 2. Lovable Editor
-      Link 3. Lovable Preview 4. Date Germany timezone YYYY-MM-DD HH:MM 5.
-      Business Type concise like Zahnarzt Restaurant Schreinerei 6. Email 7. Old
-      Site Issues 2-3 point summary 8. Old Site Examples 1-2 concrete examples
-      9. Old Site UI flaws visual interaction problems 10. Improvement potential
-      high-impact opportunities 11. Benefits of improvements business outcomes.
-      DATA SOURCES: Extract from conversation business intelligence extraction,
-      design research, website assessment. FORMATTING: Single line fields
-      separated by TAB, NO headers NO extra lines NO markdown around TSV, strip
-      internal tabs newlines, max 200 chars per field, use NA only if unknown,
-      place ONLY TSV in code block. QUALITY CHECKS: Exactly 11 fields, date
-      Germany timezone, business type specific, examples concrete, single line
-      only. OUTPUT: Return ONLY code block with single TSV row, no text before
-      or after. Example structure: BusinessName TAB editor-url TAB preview-url
-      TAB 2025-01-20 14:30 TAB Restaurant TAB email TAB issues TAB examples TAB
-      flaws TAB improvements TAB benefits. Generate actual TSV row now using
-      conversation data.';
-
-
-      console.log('Prompt:', prompt);
-
-
-      const selectors = ['textarea', 'div[contenteditable="true"]',
-      '[role="textbox"]'];
-
-      let input = null;
-
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el && window.getComputedStyle(el).display !== 'none') {
-          input = el;
-          console.log('Found input:', sel);
-          break;
-        }
-      }
-
-
-      if (!input) {
-        console.error('No input found');
-        return { error: 'Input not found', success: false };
-      }
-
-
-      function setReactValue(element, value) {
-        if (element.tagName === 'TEXTAREA') {
-          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-          setter.call(element, value);
-        } else {
-          element.textContent = value;
-        }
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-
-
-      input.focus();
-
-      await new Promise(r => setTimeout(r, 500));
-
-
-      try {
-        const success = document.execCommand('insertText', false, prompt);
-        if (!success) {
-          console.log('execCommand failed, using setReactValue');
-          setReactValue(input, prompt);
-        }
-      } catch (e) {
-        console.log('execCommand error:', e);
-        setReactValue(input, prompt);
-      }
-
-
-      return { success: true, promptLength: prompt.length };
-    args: lovableLinks
-    param: dataPrompt
-  - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const buttonSelectors = [
-        'button[type="submit"]',
-        'button[aria-label*="Submit"]',
-        'button[aria-label*="Send"]'
-      ];
-
-
-      for (const sel of buttonSelectors) {
-        const buttons = Array.from(document.querySelectorAll(sel));
-        for (const btn of buttons) {
-          const style = window.getComputedStyle(btn);
-          if (style.display !== 'none' && !btn.disabled) {
-            console.log('Clicking submit button');
-            btn.click();
-            return { success: true, method: 'button' };
-          }
-        }
-      }
-
-
-      const input = document.querySelector('textarea, [contenteditable="true"],
-      [role="textbox"]');
-
-      if (!input) return { error: 'Input lost' };
-
-
-      input.focus();
-
-
-      const form = input.closest('form');
-
-      if (form) {
-        console.log('Submitting form');
-        form.requestSubmit();
-        return { success: true, method: 'form' };
-      }
-
-
-      console.log('Using Enter key');
-
-      input.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        bubbles: true,
-        cancelable: true
-      }));
-
-
-      return { success: true, method: 'keyboard' };
-    param: dataSubmit
   - type: say
     message: AUTOMATION COMPLETE
 version: 1

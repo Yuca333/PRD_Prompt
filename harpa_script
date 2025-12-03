@@ -1,1100 +1,1377 @@
 meta:
-  title: v4.0 Complete - Site to PRD to Lovable to Data
-  description: Analyzes site, generates PRD and Lovable prompt, auto-deploys
+  title: v4.7 Complete - Site to PRD to Lovable to Data
+  description: End-to-end automation from site to PRD to Lovable with stored prompts
   category: User
 steps:
   - type: say
-    message: Starting v4.0 automation
+    message: Starting v4.7 automation
+
   - type: ask
     param: siteUrl
     message: Enter site URL
     default: ''
+
+  # 2) ChatGPT image extraction
   - type: say
-    message: Opening Perplexity
+    message: Opening ChatGPT for image extraction
+  - type: navigate
+    url: https://chatgpt.com/
+    waitForIdle: true
+  - type: wait
+    timeout: 6000
+    for: idle
+  - type: say
+    message: Sending image extraction prompt
+  - type: js
+    code: |
+      const url = args.siteUrl || '';
+      const prompt = `2 Image Task
+      ───────────────────────────────────────────────────────────────────
+
+      1. Visit the target URL given at the **end of this prompt**.
+      2. Extract 3–5 most important marketing images (Logo, Hero, Team, Product).
+      3. Output ONLY one of the two blocks below.
+
+      IMAGE INTEGRATION FOR PRD
+      ═══════════════════════════════════════════════════════════════════
+
+      <thinking_mode>
+      You MUST aggressively try to discover marketing images before concluding “no images”.
+
+      The “target URL” is the URL on the last line of this prompt. Use it for all steps below.
+
+      FETCH & RETRY STRATEGY
+
+      1. Start by fetching the page at the target URL exactly as written on the last line of this prompt.
+      2. If the target URL has no scheme, assume https:// and prepend it.
+      3. Derive HOST_ONLY as the domain part of the target URL (e.g. if the target URL is https://www.vogt-hans.de/inhalt-Dateien/image002.jpg, then HOST_ONLY is vogt-hans.de).
+      4. If the initial fetch fails for any reason (network, TLS, timeout, access, decoding error, etc.), try in this order (if different from the original):
+      • https:// + HOST_ONLY
+      • https://www. + HOST_ONLY
+      • http:// + HOST_ONLY
+      • http://www. + HOST_ONLY
+
+      Treat any successfully fetched HTML document from this domain as a candidate for parsing (home page, root, or redirected landing page).
+
+      IMAGE DISCOVERY STRATEGY (apply to each successfully fetched HTML page)
+      Use ALL of the following methods:
+      • METHOD 1 (HTML images): Scan <img>, <picture>, <source> for src, srcset, data-src.
+      • METHOD 2 (CSS backgrounds): Scan inline styles and linked stylesheets for background-image, background, or custom properties that contain image URLs.
+      • METHOD 3 (Meta images): Check <meta property="og:image">, <meta name="twitter:image">, and similar.
+      • METHOD 4 (Size/role cues): Prefer larger images, images in header/hero/slider sections, and images near main headings or marketing copy.
+
+      FILTERING & PRIORITY
+      Prioritize in this order:
+
+      1. Company logo (header/footer or clearly brand-mark).
+      2. Hero/main visual (large, above the fold, central).
+      3. Service/product images (1–2 strongest visuals).
+      4. Team/people photos (if prominent as part of marketing).
+
+      EXCLUDE:
+      • Icons smaller than ~50px, social media logos, purely decorative flourishes, menu icons, tiny bullets.
+
+      DECISION PROTOCOL (STRICT)
+      • IF you successfully identify ANY valid marketing image (logo, hero, service/product, team) using the above methods on ANY successfully loaded page from the domain →
+      → You MUST output BLOCK A.
+
+      • OTHERWISE (including ANY of the following):
+      – Only tiny icons/social logos found,
+      – Page(s) are not accessible or not parseable (network error, TLS error, encoding/decoding issues, timeout, access forbidden, unknown content type),
+      – HTML loads but no suitable marketing images can be confidently identified,
+
+      → You MUST output BLOCK B.
+
+      So BOTH:
+      • “Truly no marketing images” AND
+      • “Technical failure or inability to extract marketing images”
+
+      map to the same fallback: BLOCK B.
+
+      CRITICAL OUTPUT RULES
+      • Do NOT output “BLOCK A” or “BLOCK B” labels or any headers.
+      • Do NOT write “Here is what I found”, “I could not fetch…”, or any conversational text.
+      • Do NOT explain errors, reasons, or this decision logic.
+      • Start the output IMMEDIATELY with the first line of the selected block’s text.
+      • The output must be raw text ready for copy-pasting to another AI.
+
+      IMAGE PRIORITY (Find in this order)
+      ───────────────────────────────────────────────────────────────────
+
+      1. Company logo (header/footer)
+      2. Hero/main visual (large, above fold, central)
+      3. Service/product images (1–2 key visuals)
+      4. Team/people photos (if prominent)
+
+      EXCLUDE: Icons (<50px), social logos, decorative graphics, menu images.
+
+      EXTRACTION STRATEGY (Use ALL methods)
+      ───────────────────────────────────────────────────────────────────
+      METHOD 1: Standard Image Tags (src, srcset, data-src)
+      METHOD 2: CSS Background Images (computed styles)
+      METHOD 3: Picture Elements (<source> tags)
+      METHOD 4: Meta Tags (og:image, twitter:image)
+
+      [URL Normalization: Prepend https:// if needed. Use absolute URLs. Remove params unless vital.]
+
+      ═══════════════════════════════════════════════════════════════════
+      BLOCK A: (Use if Images Found)
+      ═══════════════════════════════════════════════════════════════════
+      Integrate the following images into the design In way they would fit best for the business and the PRD.
+      Upgrade the PRD if necessary.
+
+      1. Logo: [URL] -[Brief visual description]
+      2. Hero: [URL] - [Brief visual description]
+      3. Service: [URL] - [Brief visual description]
+      etc
+
+      PRD INTEGRATION Suggestions:
+
+      HERO IMAGE STRATEGY Suggestions:
+      • Primary Image: [URL]
+      • Treatment: [e.g., "Full background at 60% opacity with slate-900 overlay"]
+      • Mobile: [e.g., "Center-crop focus on subject, no parallax"]
+
+      • Color Suggestions: Change Primary Color to [Hex/Tailwind] to match image tones.
+
+      ADDITIONAL ASSETS:
+      • Services: Use [URL] for [Specific Service Name].
+      • About/Team: Use [URL] for "About Us" section.
+      Update your Visual Design concept with these suggestions. But you make the final call for the overall Design concept based on all the information you have available
+
+      ═══════════════════════════════════════════════════════════════════
+      BLOCK B: (Use if NO Images Found OR technical extraction failed)
+      ═══════════════════════════════════════════════════════════════════
+      DESIGN OPTIMIZATION PROMPT
+      For AI Implementation via Lovable.dev
+      <thinking_mode>
+      Deep critical analysis required. Challenge every design choice.
+      </thinking_mode>
+      SELF-CRITIQUE
+      Rate your PRD design: [X/10]
+      If not 10/10, identify gaps:
+
+      * Visual Concept: Truly business-specific or generic rebranded?
+      * CSS Strategy: Did you specify effects lovable.dev excels at (Tailwind utilities, shadcn/ui, backdrop-blur, mesh gradients) or guess?
+      * Spatial Design: Optimized for React component architecture?
+      * Hero: Actually implementable with production quality?
+      Deep Analysis Questions:
+
+      1. Does each element serve THIS business's unique positioning?
+      2. Can lovable.dev render this at boutique-level quality?
+      3. What better approach haven't I considered?
+      LOVABLE.DEV TECHNICAL CHECK
+      Verify against capabilities:
+      ✅ Use These: Tailwind CSS utilities, shadcn/ui components, CSS gradients, backdrop-blur, box-shadow, smooth transitions, responsive breakpoints, React composition
+      ⚠️ Avoid: Complex custom animations, experimental CSS, external animation libraries
+      Output:
+
+      * Effects to keep: [List]
+      * Effects to replace: [List with stable alternatives]
+      * Missing opportunities: [Lovable-optimized patterns you didn't use]
+      REFINED DESIGN
+      Based on critique, output ONLY changed sections:
+      VISUAL CONCEPT V2:
+      [Improved concept if needed, or justify why original is optimal]
+      LOVABLE-OPTIMIZED IMPLEMENTATION:
+      * Exact Tailwind classes for key effects
+      * Specific shadcn/ui components
+      * Gradient approach (CSS mesh/linear)
+      * Mobile-first breakpoint strategy
+      HERO REDESIGN:
+      [Component structure + specific visual effect implementation lovable.dev handles flawlessly]
+
+      Final Output: Updated PRD sections with lovable.dev-specific optimizations.
+      ═══════════════════════════════════════════════════════════════════
+
+      Based on the strict DECISION PROTOCOL
+
+      output only either Block A or Block B, nothing else.
+
+      TARGET URL: ${url}
+
+      _________________________`;
+
+      const inputSelectors = ['textarea', '[contenteditable="true"]', 'div[role="textbox"]'];
+      let input = null;
+      for (const sel of inputSelectors) {
+        input = document.querySelector(sel);
+        if (input) break;
+      }
+      if (!input) return { error: 'No input' };
+
+      const setReactValue = (element, value) => {
+        const descriptor = Object.getOwnPropertyDescriptor(element.__proto__, 'value');
+        const setter = descriptor && descriptor.set;
+        if (setter) setter.call(element, value); else element.value = value;
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      setReactValue(input, prompt);
+      return { success: true, length: prompt.length };
+    param: imagePrompt
+  - type: js
+    code: |
+      const sendButton = document.querySelector('button[aria-label*="Send"], button[data-testid*="send"], form button');
+      if (sendButton && !sendButton.disabled) {
+        sendButton.click();
+        return { success: true, method: 'button' };
+      }
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
+      }
+      return { error: 'No send path' };
+    param: imageSend
+  - type: js
+    code: |
+      const maxWait = 600;
+      const checkInterval = 3;
+      let waited = 0;
+      while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, checkInterval * 1000));
+        waited += checkInterval;
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+        if (!stop && input) {
+          return { finished: true, waitedSeconds: waited };
+        }
+      }
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: imageWait
+  - type: say
+    message: Copying ChatGPT image output
+  - type: js
+    code: |
+      const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+      const latestMessage = Array.from(
+        document.querySelectorAll('[data-message-author-role="assistant"], article')
+      ).filter((el) => window.getComputedStyle(el).display !== 'none').pop();
+
+      const copyButtonSelectors = [
+        'button[aria-label*="Copy"]',
+        'button[aria-label*="copy"]',
+        'button[aria-label*="clipboard"]'
+      ];
+      const isCopyButton = (btn) => {
+        if (!btn) return false;
+        const aria = (btn.getAttribute('aria-label') || '').toLowerCase();
+        return aria.includes('copy') || aria.includes('clipboard');
+      };
+
+      let copiedText = '';
+      if (latestMessage) {
+        for (const sel of copyButtonSelectors) {
+          const btn = latestMessage.querySelector(sel) || document.querySelector(sel);
+          if (isCopyButton(btn)) {
+            btn.click();
+            try {
+              await sleep(200);
+              copiedText = await navigator.clipboard.readText();
+            } catch (e) {
+              console.warn('Clipboard read failed', e);
+            }
+            break;
+          }
+        }
+      }
+      if (!copiedText && latestMessage) {
+        copiedText = latestMessage.innerText || latestMessage.textContent || '';
+      }
+      return { copiedText, length: copiedText.length };
+    param: imageOutput
+
+  # 3) Perplexity website extraction
+  - type: say
+    message: Opening Perplexity for website extraction
   - type: navigate
     url: https://www.perplexity.ai/
     waitForIdle: true
   - type: wait
-    timeout: 8000
+    timeout: 6000
     for: idle
   - type: say
-    message: Prompt 1 - Business Intelligence
-  - type: wait
-    timeout: 2000
-    for: idle
+    message: Enabling Deep Research and submitting website extraction prompt
   - type: js
-    code: >
-      const url = args.siteUrl;
-
-      const prompt = 'You are a senior business intelligence analyst
-      specializing in comprehensive website analysis for premium redesign
-      projects. TARGET WEBSITE: ' + url + ' MISSION: Extract COMPLETE website
-      intelligence to enable world-class redesign. This is a paid client
-      engagement - extract everything needed to preserve their business voice
-      and competitive positioning. EXTRACTION PROTOCOL: Browse ALL major pages
-      systematically (Homepage, Services, About, Contact, Testimonials,
-      Pricing). BUSINESS INTELLIGENCE: 1. Business Identity - Official name,
-      tagline, industry sector (specific), years in business, geographic service
-      areas. 2. Services/Offerings (CRITICAL) - For EACH service: name, complete
-      description word-for-word, benefits, pricing if stated, target customers.
-      3. Value Propositions - Why choose this business, what makes them unique,
-      competitive advantages, problems they solve. 4. Target Audience - Ideal
-      customers, demographics, pain points addressed. COMPLETE CONTENT
-      EXTRACTION (exact text, do not summarize): 1. Homepage - Hero headline
-      exact text, subheadline exact text, main CTA, every section heading and
-      body text. 2. About/Company - Complete story word-for-word, mission,
-      founder info, team bios complete text, achievements. 3. Testimonials -
-      Complete customer quotes exact words, names, titles, locations. 4.
-      Credentials - All certifications, licenses, awards, memberships, years
-      experience. 5. Contact Info - Phone, email, physical address, business
-      hours complete schedule, service areas, social media. VISUAL ASSETS:
-      Extract 2-6 most important image URLs (hero image, logo, key service
-      images, team photo). Note primary brand colors if identifiable, overall
-      visual style. CURRENT WEBSITE ASSESSMENT: Identify 4-5 CRITICAL issues
-      with specific examples (outdated design, poor mobile, unclear navigation,
-      weak CTAs, unprofessional layout). BRAND VOICE ANALYSIS: Tone
-      (professional/casual/technical), writing style, language level, key
-      phrases used, overall personality. OUTPUT FORMAT: Present as WEBSITE
-      INTELLIGENCE EXTRACTION REPORT with TARGET WEBSITE, EXTRACTION DATE, then
-      all sections. Include EXTRACTION COMPLETENESS ASSESSMENT with content
-      coverage, gaps identified, confidence level. CRITICAL: Extract complete
-      text, do NOT summarize. Preserve exact wording. Include ALL services with
-      full descriptions. Capture authentic brand voice.';
-
-
-      console.log('Prompt:', prompt);
-
-
-      const selectors = ['textarea', 'div[contenteditable="true"]',
-      '[role="textbox"]'];
-
-      let input = null;
-
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el && window.getComputedStyle(el).display !== 'none') {
-          input = el;
-          console.log('Found input:', sel);
-          break;
-        }
+    code: |
+      const toggleSelectors = ['button[aria-label*="Deep Research" i]', 'button', '[role="button"]'];
+      for (const sel of toggleSelectors) {
+        const btns = Array.from(document.querySelectorAll(sel));
+        const target = btns.find(b => /deep\s*research/i.test(b.innerText || b.textContent || '') || /deep\s*research/i.test(b.getAttribute('aria-label') || ''));
+        if (target) { target.click(); break; }
       }
+      return { toggled: true };
+    param: researchToggleOn
+  - type: js
+    code: |
+      const url = args.siteUrl || '';
+      const prompt = `1 Extraction & Intelligence Analysis
+      For Web Agency Client Redesign Projects
 
 
-      if (!input) {
-        console.error('No input found');
-        return { error: 'Input not found', success: false };
-      }
+      Your Role: You are a professional web analyst working for a web design agency.
+      Project Scenario: A small business owner has hired your agency to modernize their outdated website. They want to keep all their existing content, services, and business information - they just want it to look more professional and current. This is a standard web design service where agencies extract content from a client's old site to rebuild it with better design.
 
+      TARGET WEBSITE
+      At the end of the prompt
 
-      function setReactValue(element, value) {
-        if (element.tagName === 'TEXTAREA') {
-          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-          setter.call(element, value);
-        } else {
-          element.textContent = value;
-        }
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-      }
+      YOUR MISSION
+      Extract every piece of content from the client's website so nothing is lost when we rebuild their site with modern design. Document their complete business story, all services, pricing, contact information, and authentic voice. Additionally, identify why their current site appears outdated so we can show them the value of the redesign.
 
+      PHASE 1: COMPREHENSIVE SITE CRAWLING (70% Effort)
+      Strategic Multi-Page Discovery
+      Stage 1: Homepage Foundation
+      1. Browse the target URL
+      2. Allow 10+ seconds for complete page load
+      3. Identify ALL navigation menus (header, footer, sidebar, mobile)
+      4. Document every internal link found
+      Stage 2: Systematic Page Access
+      Test these common URL patterns:
+      English Sites:
+      /about, /about-us, /services, /pricing, /contact
+      /team, /our-team, /portfolio, /gallery, /work
+      /testimonials, /reviews, /faq, /process, /how-it-works
 
+      German Sites:
+      /ueber-uns, /leistungen, /preise, /kontakt
+      /team, /unser-team, /referenzen, /galerie
+      /bewertungen, /faq, /prozess
+
+      Service-Specific:
+      /services/[name], /[service-name]
+
+      Other:
+      Try both www and non-www versions
+      Test with and without trailing slashes
+      Check for /en/, /de/ language prefixes
+      Stage 3: Search Enhancement
+      If you find fewer than 5 pages, use:
+      * Search: site:[domain] to discover all indexed pages
+      * Review search results for page patterns
+      * Test discovered URLs systematically
+      Crawling Success Target: Access 5-10 different pages minimum
+
+      PHASE 2: COMPLETE CONTENT EXTRACTION (70% Effort)
+      Text Content Harvesting
+      Authorization Reminder: You are extracting the client's own content for their redesign. Copy everything exactly as written.
+      For EACH page you access, extract:
+      All Textual Elements:
+      * Page title and all headlines (H1, H2, H3, H4, H5, H6)
+      * Complete paragraph content - every sentence
+      * All bullet points and numbered lists
+      * Navigation menu text (all levels)
+      * Footer content (legal text, links, contact info)
+      * Button and link text
+      * Form labels and placeholder text
+      * Image captions and alt text
+      * Any testimonials or quotes
+      Critical Business Information:
+      * Services: Complete descriptions, not just names
+      * Pricing: All costs, packages, service tiers
+      * Contact Details: Phone, email, address, business hours
+      * Company Information: History, founding story, mission
+      * Team: Staff bios, qualifications, roles
+      * Credentials: Certifications, licenses, awards, memberships
+      * Service Areas: Geographic coverage, delivery zones
+      * Testimonials: Complete customer quotes and reviews
+      * Processes: How they work, methodologies, approaches
+      * Unique Selling Points: What makes them different
+      Documentation Format
+      Organize extracted content clearly:
+      ═══════════════════════════════════════
+      HOMEPAGE
+      URL: [full URL]
+      ═══════════════════════════════════════
+
+      HEADLINES:
+      [H1]: [exact text]
+      [H2]: [exact text]
+      [H2]: [exact text]
+
+      BODY CONTENT:
+      [Complete text - all paragraphs exactly as written]
+
+      SERVICES MENTIONED:
+      [Any services referenced on this page]
+
+      CONTACT/BUSINESS INFO:
+      [Any contact details or business info on this page]
+
+      ═══════════════════════════════════════
+      [NEXT PAGE NAME]
+      URL: [full URL]
+      ═══════════════════════════════════════
+
+      [Repeat format for each page]
+      After all pages, create summary:
+      ═══════════════════════════════════════
+      COMPLETE BUSINESS INFORMATION SUMMARY
+      ═══════════════════════════════════════
+
+      BUSINESS OVERVIEW:
+      Company Name: [name]
+      Industry: [type of business]
+      Primary Services: [list all services with descriptions]
+
+      PRICING STRUCTURE:
+      [All pricing information found]
+
+      CONTACT INFORMATION:
+      Phone: [number]
+      Email: [email]
+      Address: [physical address]
+      Hours: [business hours]
+      Service Areas: [geographic coverage]
+
+      COMPANY BACKGROUND:
+      [Complete company story, history, mission]
+
+      TEAM INFORMATION:
+      [All team member details found]
+
+      CREDENTIALS & CERTIFICATIONS:
+      [All licenses, certifications, awards mentioned]
+
+      CUSTOMER TESTIMONIALS:
+      [All testimonials/reviews found]
+
+      UNIQUE DIFFERENTIATORS:
+      [What makes them unique - in their words]
+      Brand Voice Analysis
+      Based on ALL extracted content, analyze:
+      BRAND VOICE & COMMUNICATION STYLE:
+
+      Tone: [Formal/Casual/Professional/Friendly - describe]
+      Writing Style: [Technical/Simple, Detailed/Concise]
+      Personality: [Key personality traits evident in writing]
+      Industry Language: [Specific terms they use for services]
+      Customer Address: [How they speak to customers - you/we/formal/informal]
+      Unique Phrases: [Any catchphrases or repeated expressions]
+      Local/Regional: [Geographic or community connections mentioned]
+
+      KEY MESSAGING THEMES:
+      - [Primary value proposition]
+      - [Main customer problems they solve]
+      - [How they differentiate from competitors]
+      - [Trust-building elements they emphasize]
+
+      PHASE 3: VISUAL ASSET EXTRACTION (10% Effort)
+      Image URL Collection
+      Extract 1-5 key images that represent the business:
+      Priority Images:
+      1. Company logo
+      2. Main hero/header image
+      3. Service images (1-2 key visuals)
+      4. Team photo (if present)
+      5. Facility/location image (if applicable)
+      Extraction Method:
+      * Right-click image → Copy Image Address
+      * Or inspect element to find <img src="[URL]">
+      * Ensure URLs are complete (start with https://)
+      * Test each URL to verify it loads
+      Documentation:
+      VISUAL ASSETS:
+
+      1. Logo
+         URL: [complete https:// URL]
+         Location: [which page it was found on]
+         Description: [what it shows]
+
+      2. Hero Image
+         URL: [complete https:// URL]
+         Location: [which page it was found on]
+         Description: [what it shows]
+
+      [Continue for each image extracted]
+
+      PHASE 4: OUTDATED DESIGN ASSESSMENT (20% Effort)
+      Current Website Issues Analysis
+      Purpose: Document why this site needs modernization to justify the redesign to the client.
+      Evaluate and document:
+      Visual Design Issues:
+      * Outdated layout (table-based design, pre-2015 aesthetics)
+      * Poor typography (system fonts, weak hierarchy, readability issues)
+      * Dated color scheme or inconsistent branding
+      * Cluttered design with poor use of white space
+      * Amateur or low-quality imagery
+      User Experience Problems:
+      * Confusing navigation structure
+      * Difficult to find important information (contact, services, pricing)
+      * Unclear calls-to-action
+      * Poor information organization
+      Mobile & Technical Issues:
+      * No responsive design or poor mobile display
+      * Slow loading speed
+      * Missing HTTPS (security warning)
+      * Broken links or outdated information
+      Professional Credibility Issues:
+      * Missing trust signals (testimonials, credentials)
+      * Outdated copyright dates or old "last updated" info
+      * No social proof or modern trust indicators
+      * Generic or stock imagery instead of authentic business photos
+      Documentation Format:
+      CURRENT WEBSITE ISSUES & REDESIGN JUSTIFICATION:
+
+      CRITICAL DESIGN PROBLEMS:
+      1. [Specific issue - e.g., "Site uses table-based layout from 2005"]
+      2. [Specific issue - e.g., "No mobile optimization - site breaks on phones"]
+      3. [Specific issue - e.g., "Contact information buried in footer, hard to find"]
+      4. [Specific issue - e.g., "Amateur design undermines professional credibility"]
+      5. [Specific issue - e.g., "Slow loading speed (5+ seconds) loses customers"]
+
+      BUSINESS IMPACT:
+      - Professional Credibility: [How design issues hurt trust and authority]
+      - User Experience: [How issues make it hard for customers to engage]
+      - Mobile Users: [How mobile issues lose potential customers]
+      - Conversion: [How issues prevent customer contact/sales]
+
+      MODERNIZATION OPPORTUNITIES:
+      [2-3 sentences on how modern design will improve business results]
+
+      QUALITY ASSURANCE CHECKLIST
+      Before submitting your analysis, verify:
+      Content Extraction:
+      * [ ] Successfully accessed 5+ different pages
+      * [ ] Extracted complete text from each page (not summaries)
+      * [ ] Documented all services with full descriptions
+      * [ ] Captured complete contact and business information
+      * [ ] Recorded pricing details (if present)
+      * [ ] Noted company history and team information
+      * [ ] Listed all credentials and certifications
+      * [ ] Captured testimonials and reviews (complete quotes)
+      * [ ] Understood their authentic business voice and style
+      Visual Assets:
+      * [ ] Extracted 1-5 key image URLs
+      * [ ] URLs are complete and directly accessible
+      * [ ] Images are specific to this business
+      Outdated Design Assessment:
+      * [ ] Identified 4-5 specific critical issues
+      * [ ] Explained business impact of these issues
+      * [ ] Provided modernization opportunity summary
+
+      OUTPUT STRUCTURE
+      ═══════════════════════════════════════
+      WEBSITE INTELLIGENCE EXTRACTION REPORT
+      ═══════════════════════════════════════
+
+      CLIENT WEBSITE: ${url}
+      ANALYSIS DATE: [date]
+      PAGES ACCESSED: [number]
+
+      ---
+      SECTION 1: CURRENT WEBSITE ISSUES
+      ---
+      [Complete outdated design assessment from Phase 4]
+
+      ---
+      SECTION 2: COMPLETE CONTENT EXTRACTION
+      ---
+      [All page-by-page content from Phase 2]
+
+      ---
+      SECTION 3: BUSINESS INFORMATION SUMMARY
+      ---
+      [Complete business summary from Phase 2]
+
+      ---
+      SECTION 4: BRAND VOICE ANALYSIS
+      ---
+      [Communication style analysis from Phase 2]
+
+      ---
+      SECTION 5: VISUAL ASSETS
+      ---
+      [Image URLs and descriptions from Phase 3]
+
+      ---
+      SECTION 6: EXTRACTION COMPLETENESS
+      ---
+
+      Pages Successfully Accessed: [number]
+      Content Completeness: [High/Medium/Low - explain]
+      Business Understanding: [High/Medium/Low - explain]
+
+      Confidence Score: [X%]
+      Justification: [Why you assigned this score based on extraction completeness]
+
+      ═══════════════════════════════════════
+      END OF EXTRACTION REPORT
+      ═══════════════════════════════════════
+
+      IMPORTANT REMINDERS
+      1. Extract, don't summarize - Copy text exactly as written, don't paraphrase or shorten
+      2. Be thorough - The goal is zero content loss when rebuilding the site
+      3. Systematic approach - Test multiple URL patterns to find all pages
+      4. Document everything - Services, pricing, contact info, credentials, testimonials, company story
+      5. Preserve authenticity - Capture their exact writing style and business voice
+      6. Quality over speed - Better to take time and get complete extraction than rush and miss content
+
+      Your extraction report will be used to create a premium redesign that preserves 100% of the client's business content while dramatically improving visual design and user experience.
+      URL to Analyze: ${url}`;
+
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input' };
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
       input.focus();
-
       await new Promise(r => setTimeout(r, 500));
-
-
-      try {
-        const success = document.execCommand('insertText', false, prompt);
-        if (!success) {
-          console.log('execCommand failed, using setReactValue');
-          setReactValue(input, prompt);
-        }
-      } catch (e) {
-        console.log('execCommand error:', e);
-        setReactValue(input, prompt);
-      }
-
-
-      return { success: true, promptLength: prompt.length };
-    args: siteUrl
-    param: paste1
+      setReactValue(input, prompt);
+      return { success: true, length: prompt.length };
+    param: perplexityPrompt1
   - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const buttonSelectors = [
-        'button[type="submit"]',
-        'button[aria-label*="Submit"]',
-        'button[aria-label*="Send"]'
-      ];
-
-
-      for (const sel of buttonSelectors) {
-        const buttons = Array.from(document.querySelectorAll(sel));
-        for (const btn of buttons) {
-          const style = window.getComputedStyle(btn);
-          if (style.display !== 'none' && !btn.disabled) {
-            console.log('Clicking submit button');
-            btn.click();
-            return { success: true, method: 'button' };
-          }
-        }
+    code: |
+      const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true, method: 'button' }; }
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
       }
-
-
-      const input = document.querySelector('textarea, [contenteditable="true"],
-      [role="textbox"]');
-
-      if (!input) return { error: 'Input lost' };
-
-
-      input.focus();
-
-
-      const form = input.closest('form');
-
-      if (form) {
-        console.log('Submitting form');
-        form.requestSubmit();
-        return { success: true, method: 'form' };
-      }
-
-
-      console.log('Using Enter key');
-
-      input.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        bubbles: true,
-        cancelable: true
-      }));
-
-
-      return { success: true, method: 'keyboard' };
-    param: submit1
-  - type: say
-    message: Waiting for response 1
-  - type: wait
-    timeout: 5000
-    for: idle
+      return { error: 'No send' };
+    param: perplexitySend1
   - type: js
     code: |
       const maxWait = 600;
-      const check = 3;
       let waited = 0;
       while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, 3000));
+        waited += 3;
         const stop = document.querySelector('button[aria-label*="Stop"]');
-        const inputSelectors = ['textarea[placeholder="Ask anything..."]', 'textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
-        let input = null;
-        for (const sel of inputSelectors) {
-          input = document.querySelector(sel);
-          if (input) break;
-        }
-        if (!stop && input) {
+        const textarea = document.querySelector('textarea#chatinput, textarea');
+        if (!stop && textarea) {
           return { finished: true, waitedSeconds: waited };
         }
-        await new Promise(r => setTimeout(r, check * 1000));
-        waited += check;
       }
       return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: wait1
-  - type: say
-    message: Response 1 complete
+    param: perplexityWait1
   - type: js
     code: |
-      await new Promise(r => setTimeout(r, 1000));
-      return window.location.href;
-    param: finalChatUrl
-  - type: wait
-    timeout: 3000
-    for: idle
+      return { url: window.location.href };
+    param: perplexityChatUrl
+
+  # 4) PRD creation prompt
   - type: say
-    message: Prompt 2 - PRD
+    message: Submitting PRD creation prompt
   - type: js
-    code: >
-      const prompt = 'You are a senior web strategist and design consultant
-      specializing in award-winning website redesigns for small businesses.
-      MISSION: Review the Website Intelligence Extraction Report you just
-      created, fill any critical gaps, then research and specify award-winning
-      design direction. PHASE 1 GAP ANALYSIS (20 percent): Review extraction for
-      missing info: Complete service descriptions, pricing, full contact info,
-      company background, team bios, credentials, testimonials, geographic
-      coverage. IF GAPS EXIST: Return to original website and extract missing
-      information. Document as ADDITIONAL EXTRACTION with category, complete
-      text, source page. PHASE 2 AWARD-WINNING DESIGN RESEARCH (80 percent):
-      PRIMARY FOCUS: Visual excellence and stunning UX. NOT priorities: SEO,
-      performance, accessibility. Search for best-in-class design: best industry
-      website design 2024, award winning industry websites, industry design
-      inspiration, luxury industry web design, premium small business design.
-      ANALYZE 5-8 EXEMPLARY WEBSITES documenting: 1. Visual Design Excellence -
-      Layout grid system white space, color palette contrast, typography
-      hierarchy, photography style, visual mood. 2. Stunning UI Elements - Hero
-      composition CTA placement, card designs shadows hover, button styles
-      micro-interactions, navigation patterns, form design, section transitions.
-      3. Premium UX - Service presentation, trust signal integration, social
-      proof display, contact CTA strategy, content organization. 4. Interactive
-      Dynamic - Scroll animations, hover states, image treatments parallax,
-      video integration, transitions. 5. Mobile Patterns - Touch-friendly
-      navigation, content prioritization, mobile interactions. OUTPUT DESIGN
-      BENCHMARK RESEARCH with industry, exemplary websites analyzed, key design
-      patterns for visual layout color typography imagery, UX navigation content
-      CTAs trust, mobile standards, conversion practices. DESIGN DIRECTION
-      SPECIFICATIONS: 1. Visual Aesthetic - Overall mood, design philosophy,
-      visual personality. 2. Color Strategy - Primary Secondary Accent colors
-      with hex codes and rationale for premium feel. 3. Typography System -
-      Heading font Body font with pairing rationale, size scale, weight
-      variations. 4. Layout Spacing - Grid system, white space philosophy,
-      section spacing, content width, mobile adaptation. 5. Photography Imagery
-      - Hero style, treatment, overlays, service images, team photos. 6. UI
-      Components - Buttons Primary Secondary Ghost specs, Cards service
-      testimonial team treatment, Forms input labels submit, Navigation desktop
-      mobile. 7. Interactive Elements - Micro-interactions, scroll animations,
-      transitions, loading states. 8. Homepage Architecture - Hero Section
-      composition impact CTA, Services layout visual interaction, Trust
-      testimonial credential authority, Contact prominence form options. 9.
-      Mobile Priorities - Touch targets thumb-friendly content navigation fast.
-      10. Design Differentiation - Unique visual elements standing out. DESIGN
-      CONFIDENCE ASSESSMENT with visual impact rating, design modernity, brand
-      fit, implementation feasibility. Combine Gap Analysis and Design Research
-      into comprehensive deliverable.';
+    code: |
+      const prompt = `PRD GENERATION for PREMIUM WEBSITE REDESIGN 
+      Visual-First Design Specifications for AI Code Generators
+      ═══════════════════════════════════════════════════════════════════
+
+      <thinking_mode>
+      Use extended thinking for this task.
+      Analyze website data, invent unique visual concepts, specify "looks and feels."
+      Focus: Visual excellence and business-specific design (NOT technical implementation).
+      </thinking_mode>
 
 
-      console.log('Prompt:', prompt);
+      YOUR ROLE & MISSION
+      ═══════════════════════════════════════════════════════════════════
+
+      You are a senior web strategist and visual design specialist.
+
+      INPUT: Website Intelligence Extraction Report
+      OUTPUT: Visual-focused PRD  that:
+      • Preserves 100% of client's content
+      • Invents unique visual design concept for THIS business
+      • Specifies detailed "looks and feels" for AI code generators
+      • Provides hero visual design approach
+      • Prepares context for design framework implementation
+
+      NOTE: Do NOT include technical stack, SEO, performance, accessibility specs.
+      This PRD focuses PURELY on creating a visually stunning demo landing page.
 
 
-      const selectors = ['textarea', 'div[contenteditable="true"]',
-      '[role="textbox"]'];
-
-      let input = null;
-
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el && window.getComputedStyle(el).display !== 'none') {
-          input = el;
-          console.log('Found input:', sel);
-          break;
-        }
-      }
+      # Take all the business information from the Chat History
 
 
-      if (!input) {
-        console.error('No input found');
-        return { error: 'Input not found', success: false };
-      }
+      PHASE 1: CONTENT VERIFICATION
+      ═══════════════════════════════════════════════════════════════════
 
+      Review extraction for completeness:
+      □ Service descriptions □ Pricing □ Contact info □ Company history
+      □ Team members □ Credentials □ Service areas □ Testimonials
+      ALL TEXTS NEED TO BE IN GERMAN like the original source website
 
-      function setReactValue(element, value) {
-        if (element.tagName === 'TEXTAREA') {
-          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-          setter.call(element, value);
-        } else {
-          element.textContent = value;
-        }
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-      }
+      IF GAPS: Extract missing information from original website.
+      PRESERVATION APPROACH:
+      Try to stay as close as possible to the original extracted texts, only do slight optimization that dont change the business personality but still improve the text quality where needed
+      
 
+      ═══════════════════════════════════════════════════════════════════
+      ═══════════════════════════════════════════════════════════════════
+      ═══════════════════════════════════════════════════════════════════
+      * A heritage family restaurant might need: Warm, textured, grounded aesthetics (paper/wood feel, NOT glass/chrome)
+      * A modern medical practice might need: Clean, precise, calming aesthetics (clarity and trust signals)
+      * A traditional trade business might need: Bold, reliable, straightforward aesthetics (utility and strength)
+      * A personal wellness service might need: Gentle, approachable, refined aesthetics (comfort and artistry)
+      YOUR TASK: Analyze THIS specific business. What do THEY need? Don't force-fit into examples above.
+      * Depth & Layering: Glassmorphism (backdrop-blur), hard shadows (drop-shadow), subtle elevation (box-shadow), flat borders
+      * Surface Quality: Texture overlays (noise), gradients (mesh/linear), solid colors, pattern backgrounds
+      * Light & Glow: Neon effects (text-shadow, glow), soft halos, harsh spotlights, ambient diffusion
+      * Motion & Transform: Parallax scrolling, hover lifts, smooth fades, instant snaps, spring animations
+      * Shape & Form: Rounded corners, sharp edges, organic blobs, geometric grids, asymmetric layouts
+      Analyze and self reflect over the given concept. Is it the best fit for the business from the PRD. 
+      YOUR TASK: Analyze THIS business deeply. Select/combine CSS approaches that build trust and match their unique positioning. Think beyond the examples—what does THIS specific business need?
+      1. CONCEPT NAME: "[Your invented 2-3 word concept specific to THIS business]"
+      ═══════════════════════════════════════════════════════════════════
+      these values are just examples, please think well what would be the best spatial design. 
+      ═══════════════════════════════════════════════════════════════════
+      ═══════════════════════════════════════════════════════════════════
+      only create if fitting for the business
+      ═══════════════════════════════════════════════════════════════════
 
+      HOMEPAGE STRUCTURE:
+      
+      think of a ideal structure for this Business and  VISUAL CONCEPT INVENTION
+      ═══════════════════════════════════════════════════════════════════
+      ═══════════════════════════════════════════════════════════════════
+      ═══════════════════════════════════════════════════════════════════
+      ───────────────────────────────────────────────────────────────────
+      ───────────────────────────────────────────────────────────────────
+
+      ───────────────────────────────────────────────────────────────────
+
+      ───────────────────────────────────────────────────────────────────
+      ═══════════════════════════════════════════════════════════════════
+      ───────────────────────────────────────────────────────────────────
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input' };
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
       input.focus();
-
       await new Promise(r => setTimeout(r, 500));
-
-
-      try {
-        const success = document.execCommand('insertText', false, prompt);
-        if (!success) {
-          console.log('execCommand failed, using setReactValue');
-          setReactValue(input, prompt);
-        }
-      } catch (e) {
-        console.log('execCommand error:', e);
-        setReactValue(input, prompt);
-      }
-
-
-      return { success: true, promptLength: prompt.length };
-    param: paste2
+      setReactValue(input, prompt);
+      return { success: true, length: prompt.length };
+    param: perplexityPrompt2
   - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const buttonSelectors = [
-        'button[type="submit"]',
-        'button[aria-label*="Submit"]',
-        'button[aria-label*="Send"]'
-      ];
-
-
-      for (const sel of buttonSelectors) {
-        const buttons = Array.from(document.querySelectorAll(sel));
-        for (const btn of buttons) {
-          const style = window.getComputedStyle(btn);
-          if (style.display !== 'none' && !btn.disabled) {
-            console.log('Clicking submit button');
-            btn.click();
-            return { success: true, method: 'button' };
-          }
-        }
+    code: |
+      const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true, method: 'button' }; }
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
       }
-
-
-      const input = document.querySelector('textarea, [contenteditable="true"],
-      [role="textbox"]');
-
-      if (!input) return { error: 'Input lost' };
-
-
-      input.focus();
-
-
-      const form = input.closest('form');
-
-      if (form) {
-        console.log('Submitting form');
-        form.requestSubmit();
-        return { success: true, method: 'form' };
-      }
-
-
-      console.log('Using Enter key');
-
-      input.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        bubbles: true,
-        cancelable: true
-      }));
-
-
-      return { success: true, method: 'keyboard' };
-    param: submit2
-  - type: say
-    message: Waiting for response 2
-  - type: wait
-    timeout: 5000
-    for: idle
+      return { error: 'No send' };
+    param: perplexitySend2
   - type: js
     code: |
       const maxWait = 600;
-      const check = 3;
       let waited = 0;
       while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, 3000));
+        waited += 3;
         const stop = document.querySelector('button[aria-label*="Stop"]');
-        const inputSelectors = ['textarea[placeholder="Ask anything..."]', 'textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
-        let input = null;
-        for (const sel of inputSelectors) {
-          input = document.querySelector(sel);
-          if (input) break;
-        }
-        if (!stop && input) {
-          return { finished: true, waitedSeconds: waited };
-        }
-        await new Promise(r => setTimeout(r, check * 1000));
-        waited += check;
+        const textarea = document.querySelector('textarea#chatinput, textarea');
+        if (!stop && textarea) return { finished: true, waitedSeconds: waited };
       }
       return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: wait2
+    param: perplexityWait2
+  # 5) Paste image extraction output into Perplexity
   - type: say
-    message: Response 2 complete
-  - type: wait
-    timeout: 3000
-    for: idle
-  - type: say
-    message: Prompt 3 - Lovable Phase 1
-  - type: js
-    code: >
-      const prompt = '# LOVABLE.DEV PROMPT FRAMEWORK v3.0\n## AI-to-AI Prompt
-      Generator for Award-Winning Landing Pages\n\n---\n\n## YOUR ROLE\n\nYou
-      are a prompt engineer specializing in generating optimized Lovable.dev
-      prompts (Max 2600 words). Your task is to transform business information
-      into a comprehensive, research-backed prompt that Lovable.dev\'s Claude AI
-      will use to generate award-winning landing page code.\n\n**You do NOT
-      generate the landing page code itself. You generate the PROMPT for
-      Lovable.dev.**\n\n---\n\n## TWO-PHASE STRATEGY\n\n**Phase 1** (Output
-      now): Core structure, layout, conversion strategy (1,800-2,500
-      words)\n**Phase 2** (Output only when requested): Advanced visual
-      enhancements (1,800-2,500 words)\n\nPlan both phases strategically, but
-      output only Phase 1 unless specifically asked for Phase 2.\n\n---\n\n##
-      PHASE 1: PLANNING PROCESS\n\n### 1. Extract & Research Business
-      Context\n\nRead business information from the conversation. If critical
-      details are missing, use web_search to gather:\n- Company positioning,
-      unique value proposition, visual identity\n- Target audience demographics,
-      device usage patterns, pain points\n- Competitor design patterns for
-      differentiation opportunities\n- Industry-specific trust signals and
-      conversion best practices\n\nDocument your understanding:\n- **Company**:
-      [Name, industry, core offering]\n- **Audience**: [Specific demographic +
-      psychographic + use case]\n- **Goal**: [Measurable outcome - "Generate X
-      demos monthly" not "get leads"]\n- **Device Priority**: [Mobile-first /
-      Desktop-primary with industry justification]\n\n### 2. Define Visual
-      Strategy\n\nChoose aesthetic anchor based on brand personality:\n-
-      **Design Movement Mashup**: "Brutalism meets Scandinavian minimalism"\n-
-      **Brand Comparison**: "Stripe\'s technical precision with Notion\'s
-      warmth"\n- **Sensory Description**: "Sunlit Scandinavian cafe - clean
-      lines, natural warmth, focused calm"\n\nEstablish hierarchy intent:\n-
-      **Primary (60% attention)**: [Hero CTA / Product showcase / Value prop]\n-
-      **Secondary (30%)**: [Features / Social proof / Trust signals]\n-
-      **Tertiary (10%)**: [Footer / Navigation / Fine print]\n\nDefine color
-      strategy using emotional language:\n- **Base**: "Nordic palette with soft
-      grays and warm woods" (NOT hex codes)\n- **Accent**: "Oxidized copper" or
-      "Forest sage" (single color for conversion points)\n- **Application**:
-      "70% neutral space, accent exclusively for CTAs"\n\n### 3. Identify Core
-      Constraints\n\nSelect 3-5 positive constraints specific to this
-      business:\n1. **White Space Strategy**: 80px section padding, 60px CTA
-      isolation buffer\n2. **Typography Hierarchy**: 3-tier system (48-72px
-      hero, 32-40px sections, 16-18px body)\n3. **Asymmetric Layout**: 60/40
-      splits, magazine-style composition, avoid centered balance\n4. **Color
-      Discipline**: 3 colors max + neutrals, accent only for conversion
-      elements\n5. **Mobile-First Touch**: 44x44px minimum touch targets,
-      thumb-zone CTAs\n\n### 4. Plan Image Integration\n\nExtract image URLs
-      from conversation. Plan strategic placement:\n- **Hero**: Background or
-      split-screen composition with overlay for text readability\n- **Social
-      Proof**: Team photos, customer logos, authentic testimonials (not
-      stock)\n- **Features**: Supporting visuals, before/after comparisons,
-      process illustrations\n- **Trust Signals**: Certification badges, team
-      headshots, facility photos\n\nSpecify: `Use provided image: [URL] for
-      [section] positioned [layout description]`\n\n### 5. Allocate Content to
-      Phases\n\n**Phase 1 Focus**:\n- Page structure and layout\n- Conversion
-      strategy and CTA hierarchy\n- Core visual direction and constraints\n-
-      Functional requirements and technical stack\n- Image placement
-      strategy\n\n**Phase 2 Reserve** (don\'t output yet):\n- Framer Motion
-      animations (scroll reveals, entrance effects, parallax)\n-
-      Micro-interactions (hover states, button morphs, cursor effects)\n- Custom
-      illustrations and SVG graphics\n- Premium polish (textures, gradients, 3D
-      depth)\n- Advanced storytelling elements\n\n---\n\n## PHASE 1: OUTPUT
-      FORMAT\n\nGenerate a complete Lovable.dev prompt following this
-      structure:\n\n```\nCreate a [aesthetic description] landing page for
-      [Business], a [industry] business serving [specific target
-      audience].\n\nBUSINESS CONTEXT\n- Company: [Name and core offering]\n-
-      Audience: [Specific demographic with context and pain points]\n- Goal:
-      [Measurable conversion objective]\n- Device Priority:
-      [Mobile-first/Desktop-primary with justification]\n\nDESIGN
-      DIRECTION\nAesthetic: [Design movement mashup or sensory
-      description]\nHierarchy: Primary (60%) [element], Secondary (30%)
-      [elements], Tertiary (10%) [elements]\nColors: Base [contextual
-      description], Accent [single color name], Application [distribution
-      strategy]\n\nCORE CONSTRAINTS\n1. [Positive constraint with specific
-      measurement]\n2. [Positive constraint with specific measurement]\n3.
-      [Positive constraint with specific measurement]\n4. [Optional 4th
-      constraint]\n5. [Optional 5th constraint]\n\nTECHNICAL STACK\n- React 18 +
-      TypeScript\n- Tailwind CSS v4 (use @theme in globals.css, NOT
-      tailwind.config.js)\n- shadcn/ui components: [Auto-Form for forms, Dialog
-      for modals, DataTable if needed]\n- Framer Motion for animations\n-
-      Advanced Tailwind: backdrop-blur-sm, group-hover:, custom @keyframes,
-      motion-safe: prefix\n\nRESPONSIVE STRATEGY\n- Base: 375px mobile (no
-      prefix)\n- sm: 640px tablet adjustments\n- lg: 1024px desktop asymmetric
-      grids\n- xl: 1280px enhanced spacing\n\nIMAGE INTEGRATION\n[For each
-      provided image URL:]\n- Use [URL] in [section]: [specific placement and
-      layout treatment]\n- Example: "Use [hero-image.jpg] as hero background
-      with 40% opacity overlay for text readability"\n\nPAGE STRUCTURE\n\nHero
-      Section (Above Fold Priority)\nLayout: F-pattern flow, 60/40 asymmetric
-      split on desktop, single column mobile\nContent:\n- Headline:
-      [Benefit-focused, specific - "Close Deals 3x Faster" NOT "Best
-      Solution"]\n- Subheadline: [One sentence explaining mechanism]\n- Primary
-      CTA: 52px height, accent color, first-person copy ("Start My Free Trial"),
-      includes benefit reminder\n- Trust Signal: [Specific metric - "2,847
-      companies" OR security badge]\nVisual: [Image placement strategy with
-      overlay/positioning specs]\nSpacing: 60px CTA isolation, generous white
-      space channel funneling to action\n\nSocial Proof Section\nLayout:
-      Featured testimonial (60% visual weight) + supporting elements
-      (40%)\nContent:\n- Featured: Real photo, full name, company logo, specific
-      metric ("Increased leads 127% in 90 days")\n- Supporting: "Join 4,847
-      [audience] who [outcome] in [timeframe]"\n- Client Logos: 6-8 max,
-      grayscale for consistency\n- Industry Trust Markers: [Certifications,
-      years, case results, guarantees]\nVisual: [Testimonial image placement,
-      logo grid treatment]\n\nFeatures/Services Section\nLayout: Asymmetric
-      3-column grid (avoid symmetrical balance)\nEach Feature:\n- Icon: 48px,
-      simple geometric (NO emojis)\n- Headline: 20px, benefit-focused ("Never
-      Miss Follow-Up" NOT "Email Automation")\n- Bullets: 3 max, bold key
-      phrases\nInteractions: Cards scale 1.02 on hover (0.3s ease), shadow
-      increase\nVisual: [Feature illustration or screenshot placement if images
-      provided]\n\nCall-to-Action Section\nCTA Hierarchy:\n1. Primary: 56px
-      height, solid accent, first-person copy with benefit, 80px isolation\n2.
-      Secondary: 44px outline style, supporting action\n3. Tertiary: Text link
-      only\nForm Design (if lead generation):\n- Progressive disclosure:
-      Multi-step (email → details → contact)\n- Progress indicator: Visual bar
-      "Step 1 of 3"\n- Fields: 48px height, 16px font, labels above (not
-      placeholder-only)\n- Trust micro-copy: "We never share your email" with
-      lock icon\n- Inline validation: Checkmark on valid format\nMobile: Sticky
-      bottom bar (60px) after 50% scroll, primary CTA + offer
-      reminder\n\nFooter\nMinimal visual weight, 30% opacity colors, 14px
-      text\nContent: Company info, privacy/terms, social links, newsletter
-      signup (tertiary priority)\n\nDESIGN EXCELLENCE\n\nWhite Space: 80px
-      section padding desktop, 60px mobile, 8px grid system
-      (16/24/32/40/48/64/80 multiples)\n\nMicro-Interactions: (200-400ms
-      duration)\n- Buttons: Scale 1.05 hover, 0.95 active, 0.3s ease\n- Links:
-      Underline slide from left (0.2s), color shift to accent\n- Cards:
-      translateY(-4px) with shadow enhancement\n- Icons: 5° rotation or slight
-      scale\n- Form fields: Border to accent on focus (0.2s)\n\nTypography:\n-
-      Headline letter-spacing: -0.02em (tighter for impact)\n- Body
-      letter-spacing: 0.01em (loose for readability)\n- Line length: 65
-      characters max\n- No single-word line endings in headlines\n\nColor
-      Application:\n- Base: 70% of visual space\n- Accent: Exclusively for
-      conversion elements (CTAs, links, interactive states)\n- Trust
-      backgrounds: Brand color at 5% opacity\n- Urgency elements: Warm accent at
-      10% opacity for timers/limited offers\n\nDepth System:\n- Cards at rest:
-      2px shadow\n- Hover: 8px shadow\n- Active/Modal: 24px shadow\n- Layered
-      shadows: shadow-sm shadow-primary/10, shadow-md shadow-primary/5\n\nMOBILE
-      OPTIMIZATION\n- Touch targets: 44x44px minimum\n- Thumb-zone: Primary CTAs
-      bottom third of viewport\n- Single-column flow on 375px base\n- Test text
-      overflow with long strings\n- No horizontal scroll\n- Sticky elements
-      respect safe-area-insets\n\nCRITICAL REMINDERS\n1. Front-load important
-      important content - users decide in 5 seconds\n2. Single dominant CTA per
-      viewport section\n3. Restrained color palette (3 max + neutrals)\n4.
-      Generous white space (80px padding) = premium perception\n5. Mobile-first
-      with 44px touch targets\n\nGoal: Award-winning design that converts. Every
-      design choice has strategic intent. Balance premium aesthetics with clear
-      conversion strategy.\n\nStart building now.\n```\n\n---\n\n## PHASE 1:
-      QUALITY CHECKLIST\n\nBefore outputting the prompt, verify:\n- [ ] Business
-      context is specific (not generic)\n- [ ] Aesthetic anchor creates clear
-      visual direction\n- [ ] All constraints are positive ("Use X" not "Avoid
-      Y")\n- [ ] Measurements are specific (80px, 0.3s, 44x44px)\n- [ ]
-      Conversion strategy embedded in each section\n- [ ] Industry trust signals
-      identified\n- [ ] All provided image URLs integrated with placement
-      strategy\n- [ ] Advanced Tailwind features requested\n- [ ] Mobile
-      requirements include exact touch targets\n- [ ] Critical constraints
-      appear at start AND end (primacy/recency)\n- [ ] Word count: 1,800-2,500
-      words\n- [ ] NO meta-commentary - just the prompt itself\n\n---\n\n##
-      PHASE 2: STRATEGY (Keep in Context, Don\'t Output Yet)\n\nWhen user
-      requests "generate Phase 2 prompt", create enhancement prompt (1,800-2,500
-      words):\n\n**Structure:**\n```\nEnhance the landing page with premium
-      visual refinements:\n\nADVANCED ANIMATIONS (500 words)\n[Framer Motion
-      implementations: scroll reveals, entrance sequences, parallax
-      effects]\n[Specify variants, timing functions, stagger patterns, trigger
-      conditions]\n\nMICRO-INTERACTIONS (400 words)\n[Button morphs, card
-      reveals, cursor effects, loading sequences]\n[Precise timing, easing
-      functions, hover choreography]\n\nCUSTOM ILLUSTRATIONS (300 words)\n[SVG
-      elements, abstract shapes, brand-aligned graphics, icon
-      systems]\n[Geometric patterns, organic shapes framing content]\n\nPREMIUM
-      POLISH (400 words)\n[Textures, noise patterns, gradient systems,
-      typography treatments]\n[3D perspective effects, glassmorphic layers,
-      depth enhancements]\n\nINTERACTIVE STORYTELLING (400 words)\n[Scroll-based
-      transitions, animated data visualizations, timeline
-      progressions]\n[Before/after sliders, testimonial carousels, product
-      showcases]\n\nMaintain core structure and conversion strategy. Focus
-      exclusively on elevating visual sophistication to award-winning
-      standards.\n```\n\n**Phase 2 reserves:**\n- Framer Motion scroll reveals
-      with useInView\n- Magnetic buttons with cursor proximity\n- Staggered
-      animations with orchestration\n- Custom cursor interactions\n- Animated
-      gradient backgrounds\n- Kinetic typography\n- 3D card transforms on
-      hover\n- Smooth page transitions\n- Progress indicators and loading
-      states\n- Interactive data visualizations\n\n---\n\n## OUTPUT\n\nGenerate
-      the complete Phase 1 Lovable.dev prompt now. Output ONLY the prompt  (max
-      2600 words)- no explanations, no commentary, no meta-discussion.';
-
-
-      console.log('Prompt:', prompt);
-
-
-      const selectors = ['textarea', 'div[contenteditable="true"]',
-      '[role="textbox"]'];
-
-      let input = null;
-
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el && window.getComputedStyle(el).display !== 'none') {
-          input = el;
-          console.log('Found input:', sel);
-          break;
-        }
-      }
-
-
-      if (!input) {
-        console.error('No input found');
-        return { error: 'Input not found', success: false };
-      }
-
-
-      function setReactValue(element, value) {
-        if (element.tagName === 'TEXTAREA') {
-          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-          setter.call(element, value);
-        } else {
-          element.textContent = value;
-        }
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-
-
-      input.focus();
-
-      await new Promise(r => setTimeout(r, 500));
-
-
-      try {
-        const success = document.execCommand('insertText', false, prompt);
-        if (!success) {
-          console.log('execCommand failed, using setReactValue');
-          setReactValue(input, prompt);
-        }
-      } catch (e) {
-        console.log('execCommand error:', e);
-        setReactValue(input, prompt);
-      }
-
-
-      return { success: true, promptLength: prompt.length };
-    param: paste3
-  - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const buttonSelectors = [
-        'button[type="submit"]',
-        'button[aria-label*="Submit"]',
-        'button[aria-label*="Send"]'
-      ];
-
-
-      for (const sel of buttonSelectors) {
-        const buttons = Array.from(document.querySelectorAll(sel));
-        for (const btn of buttons) {
-          const style = window.getComputedStyle(btn);
-          if (style.display !== 'none' && !btn.disabled) {
-            console.log('Clicking submit button');
-            btn.click();
-            return { success: true, method: 'button' };
-          }
-        }
-      }
-
-
-      const input = document.querySelector('textarea, [contenteditable="true"],
-      [role="textbox"]');
-
-      if (!input) return { error: 'Input lost' };
-
-
-      input.focus();
-
-
-      const form = input.closest('form');
-
-      if (form) {
-        console.log('Submitting form');
-        form.requestSubmit();
-        return { success: true, method: 'form' };
-      }
-
-
-      console.log('Using Enter key');
-
-      input.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        bubbles: true,
-        cancelable: true
-      }));
-
-
-      return { success: true, method: 'keyboard' };
-    param: submit3
-  - type: say
-    message: Waiting for Lovable Phase 1 prompt
-  - type: wait
-    timeout: 5000
-    for: idle
+    message: Pasting image extraction output into Perplexity
   - type: js
     code: |
-      const maxWait = 600;
-      const check = 3;
-      let waited = 0;
-      while (waited < maxWait) {
-        const stop = document.querySelector('button[aria-label*="Stop"]');
-        const inputSelectors = ['textarea[placeholder="Ask anything..."]', 'textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
-        let input = null;
-        for (const sel of inputSelectors) {
-          input = document.querySelector(sel);
-          if (input) break;
-        }
-        if (!stop && input) {
-          return { finished: true, waitedSeconds: waited };
-        }
-        await new Promise(r => setTimeout(r, check * 1000));
-        waited += check;
-      }
-      return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: wait3
-  - type: say
-    message: Phase 1 prompt ready
-  - type: say
-    message: Extracting Phase 1 text
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 2000));
-
-      let msgs = Array.from(document.querySelectorAll('div.prose'));
-
-      if (msgs.length === 0) return '';
-
-      return (msgs[msgs.length - 1].innerText || msgs[msgs.length -
-      1].textContent || '').trim();
-    param: phase1Prompt
-  - type: say
-    message: Phase 1 stored
-  - type: wait
-    timeout: 3000
-    for: idle
-  - type: say
-    message: Prompt 4 - Phase 2 Enhancement
-  - type: wait
-    timeout: 3000
-    for: idle
-  - type: js
-    code: >
-      const prompt = 'Generate Phase 2 enhancement prompt for Lovable. CRITICAL:
-      Output ONLY the prompt, no intro. First word Enhance. PHASE 2 FOCUS: NOT
-      structure or content, page already built. ADD advanced visual refinements,
-      sophisticated animations, premium polish, interactive elements. OPTIMAL
-      1200-1800 words. Front-load impactful enhancements. FRAMEWORK: First 300
-      tokens Enhance existing maintain structure focus visual. Positive Add X
-      not Improve. Specific Implement parallax 0.5 speed. Exact timing 0.8s
-      ease-out. CATEGORIES: ADVANCED ANIMATIONS 40 percent: Hero entrance
-      headline 0.6s subhead delay 0.3s CTA 0.4s, background parallax gradient
-      particle. Scroll Reveals stagger 0.1s delay translateY 40px to 0, scale
-      0.9 to 1.0, trigger 80 percent viewport useInView. Section Transitions
-      diagonal 5-7 degrees, fade crossfade, parallax 0.3-0.7 speeds.
-      MICRO-INTERACTIONS 30 percent: Buttons hover scale 1.05 shadow 4-12px
-      0.3s, active 0.95, ripple, icons slide 4px. Cards hover translateY -8px
-      shadow, content reveal, border glow, tilt 2-3deg perspective. Forms focus
-      border scale 1.02, label float, checkmark valid, shake error. Links
-      underline slide 0.2s, color morph, icon rotate 5deg. VISUAL POLISH 20
-      percent: Glassmorphic backdrop-blur-md semi-transparent, overlays modals.
-      Gradients animated 3-5s cycles, mesh multiple stops, text fills. Textures
-      noise 2-3 percent opacity, patterns low opacity, organic shapes. Shadows
-      layered multiple, accent-tinted 15 percent, elevation 2px 8px 24px states.
-      INTERACTIVE 10 percent: Scroll progress bar top fills, section highlights.
-      Cursor custom magnetic trail. Loading skeletons progress optimistic.
-      TECHNICAL: Framer Motion import motion useScroll useTransform useInView,
-      variants sequences, useInView triggers, useScroll parallax. Performance
-      transforms only never layout, motion-safe prefix, 60fps target. Timing
-      fast 0.2-0.3s ease, medium 0.4-0.6s ease-in-out, slow 0.8-1.2s custom,
-      stagger 0.1s delay. OUTPUT: Enhance existing maintain structure. ADVANCED
-      ANIMATIONS hero scroll sections. MICRO-INTERACTIONS buttons cards forms
-      links. VISUAL POLISH glass gradients textures shadows. INTERACTIVE
-      progress cursor loading. TECHNICAL motion performance timing. REMINDERS
-      maintain content structure brand 60fps motion-safe. Implement now.';
-
-
-      console.log('Prompt:', prompt);
-
-
-      const selectors = ['textarea', 'div[contenteditable="true"]',
-      '[role="textbox"]'];
-
-      let input = null;
-
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el && window.getComputedStyle(el).display !== 'none') {
-          input = el;
-          console.log('Found input:', sel);
-          break;
-        }
-      }
-
-
-      if (!input) {
-        console.error('No input found');
-        return { error: 'Input not found', success: false };
-      }
-
-
-      function setReactValue(element, value) {
-        if (element.tagName === 'TEXTAREA') {
-          const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-          setter.call(element, value);
-        } else {
-          element.textContent = value;
-        }
-        element.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-
-
+      const text = (args.imageOutput && args.imageOutput.copiedText) || '';
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input' };
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
       input.focus();
-
       await new Promise(r => setTimeout(r, 500));
-
-
-      try {
-        const success = document.execCommand('insertText', false, prompt);
-        if (!success) {
-          console.log('execCommand failed, using setReactValue');
-          setReactValue(input, prompt);
-        }
-      } catch (e) {
-        console.log('execCommand error:', e);
-        setReactValue(input, prompt);
-      }
-
-
-      return { success: true, promptLength: prompt.length };
-    param: paste4
+      setReactValue(input, text);
+      return { success: Boolean(text), length: text.length };
+    args: imageOutput
+    param: perplexityPasteImages
   - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const buttonSelectors = [
-        'button[type="submit"]',
-        'button[aria-label*="Submit"]',
-        'button[aria-label*="Send"]'
-      ];
-
-
-      for (const sel of buttonSelectors) {
-        const buttons = Array.from(document.querySelectorAll(sel));
-        for (const btn of buttons) {
-          const style = window.getComputedStyle(btn);
-          if (style.display !== 'none' && !btn.disabled) {
-            console.log('Clicking submit button');
-            btn.click();
-            return { success: true, method: 'button' };
-          }
-        }
+    code: |
+      const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true } };
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
       }
-
-
-      const input = document.querySelector('textarea, [contenteditable="true"],
-      [role="textbox"]');
-
-      if (!input) return { error: 'Input lost' };
-
-
-      input.focus();
-
-
-      const form = input.closest('form');
-
-      if (form) {
-        console.log('Submitting form');
-        form.requestSubmit();
-        return { success: true, method: 'form' };
-      }
-
-
-      console.log('Using Enter key');
-
-      input.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        bubbles: true,
-        cancelable: true
-      }));
-
-
-      return { success: true, method: 'keyboard' };
-    param: submit4
-  - type: say
-    message: Waiting for Phase 2 prompt
-  - type: wait
-    timeout: 5000
-    for: idle
+      return { error: 'No send' };
+    param: perplexitySendImages
   - type: js
     code: |
       const maxWait = 300;
-      const check = 3;
       let waited = 0;
       while (waited < maxWait) {
+        await new Promise(r => setTimeout(r, 3000));
+        waited += 3;
         const stop = document.querySelector('button[aria-label*="Stop"]');
-        const inputSelectors = ['textarea[placeholder="Ask anything..."]', 'textarea', 'div[contenteditable="true"]', '[role="textbox"]'];
-        let input = null;
-        for (const sel of inputSelectors) {
-          input = document.querySelector(sel);
-          if (input) break;
-        }
-        if (!stop && input) {
-          return { finished: true, waitedSeconds: waited };
-        }
-        await new Promise(r => setTimeout(r, check * 1000));
-        waited += check;
+        const textarea = document.querySelector('textarea#chatinput, textarea');
+        if (!stop && textarea) return { finished: true, waitedSeconds: waited };
       }
       return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: wait4
+    param: perplexityWaitImages
+  # 6) Lovable prompting framework (Phase 1) in Perplexity
   - type: say
-    message: Phase 2 prompt ready
-  - type: say
-    message: Extracting Phase 2 text
-  - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 2000));
-
-      let msgs = Array.from(document.querySelectorAll('div.prose'));
-
-      if (msgs.length === 0) return '';
-
-      return (msgs[msgs.length - 1].innerText || msgs[msgs.length -
-      1].textContent || '').trim();
-    param: phase2Prompt
-  - type: say
-    message: Phase 2 stored
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: say
-    message: Returning to Perplexity
-  - type: navigate
-    url: https://lovable.dev
-    waitForIdle: true
-  - type: wait
-    timeout: 8000
-    for: idle
-  - type: say
-    message: Waiting for Lovable to load
+    message: Submitting LOVABLE PROMPTING FRAMEWORK (Phase 1) to Perplexity
   - type: js
     code: |
-      const maxWait = 30;
-      let waited = 0;
-      while (waited < maxWait) {
-        const input = document.querySelector('textarea#chatinput');
-        if (input && !input.disabled) {
-          return { ready: true, waitedSeconds: waited };
-        }
-        await new Promise(r => setTimeout(r, 1000));
-        waited += 1;
-      }
-      return { ready: false, timeout: true };
-    param: lovableReady
-  - type: say
-    message: Lovable ready - Pasting Phase 1
-  - type: js
-    code: >
-      const text = args.phase1Prompt;
+      const prompt = `# LOVABLE PROMPTING FRAMEWORK
+---
+## PURPOSE
+You are an AI Prompt Architect. You transform the Product Requirement Documents (PRDs) from this chat  into implementation prompts for Lovable.dev (the AI Coder). Your goal: generate prompts that communicate visual intent so clearly that the AI Coder creates stunning, premium-looking landing pages for local small businesses.
 
-      console.log('Phase 1 length:', text.length);
+**Your role:** Communicate design vision and content. Describe *what* and *why*.
+**AI Coder's role:** Implement the design. Decide *how*.
+**Output priorities:**
+1. Clear visual intent communication
+2. Complete content delivery
+3. Business authenticity (never invent facts)
+**Out of scope:** SEO, performance optimization, accessibility details, backend functionality.
+—
+## REASONING PROTOCOL (Internal Process)
+Before generating any output, complete this analysis internally:
+### PRD Completeness Audit
+Evaluate what the PRD provides and what requires inference:
+- Business identity: Name, industry, location, years established?
+- Content inventory: Services, testimonials, team info, contact details?
+- Visual direction: Brand colors, existing logo, style preferences?
+- Missing elements: What must be inferred vs. what must be excluded?
+### Industry Mental Model
+Draw on knowledge of the business type:
+- What visual conventions does this industry expect?
+- What would feel inappropriate or off-brand?
+- What emotional response should visitors have?
+### Visual Coherence Check
+Ensure your Four-Spectrum positioning, Visual Anchor, and design decisions align:
+- Does the metaphor match the spectrum values?
+- Would these colors/typography serve this industry?
+- Is there internal consistency across all design choices?
+### Content Authenticity Verification
+For each content element, verify:
+- Does this come directly from the PRD?
+- Am I inventing, assuming, or inferring?
+- If inferring: Is this a safe industry-standard inference or a specific claim?
+### Phase Distribution Planning
+Determine what belongs in each phase:
+- Phase 1: All foundational decisions + all content
+- Phase 2: Interaction refinements, motion polish, visual depth enhancements
+- Prepare internally to generate Phase 2 when requested
+---
+## YOUR OUTPUT: TWO PROMPTS
+### Phase 1: Foundation + Content (2,000-2,800 words)
+- Complete visual concept and design intent
+- ALL text content in compressed appendix
+- Section structure and priorities
+- Basic animation character
+### Phase 2: Premium Polish (600-1,200 words)
+- Refinements based on Phase 1 result
+- NO content repetition
+- Enhancement requests only
+- Triggered after user reviews Phase 1 implementation
+
+**Phase 2 Awareness:** While generating Phase 1, internally prepare for Phase 2. Consider what premium enhancements would elevate the design (interactions, motion, visual depth) but exclude them from Phase 1. Output ONLY Phase 1 until explicitly asked for Phase 2.
+
+---
+## VISUAL CONCEPT SYNTHESIS
+### Step 1: Four-Spectrum Positioning
+Analyze the PRD and position the design on these spectra (0-100%):
+| Spectrum | 0% | 100% | Industry Anchors |
+|----------|-----|------|------------------|
+| **Luminosity** | Dark, cinematic, moody | Bright, airy, open | Bar/Lounge: 20-30% · Bakery: 75-85% · Medical: 60-70% |
+| **Materiality** | Synthetic, glass, metal | Organic, paper, fabric | Tech: 15-25% · Florist: 80-90% · Restaurant: 50-70% |
+| **Temperature** | Cool, clinical, precise | Warm, welcoming, human | Law firm: 30-40% · Café: 75-85% · Spa: 60-70% |
+| **Shape Language** | Sharp, geometric, angular | Soft, rounded, flowing | Architecture: 10-20% · Childcare: 85-95% · Dental: 50-60% |
+Output format: `Luminosity 70% | Materiality 30% | Temperature 80% | Shape 60%`
+
+### Step 2: Visual Anchor Metaphor
+
+Create ONE rich sensory metaphor (15-25 words) that captures the entire design feeling. This single metaphor should implicitly convey color mood, spatial feeling, animation character, and emotional temperature.
+**Strong examples:**
+- "Morning light through frosted glass onto warm oak, steam rising from a ceramic cup"
+- "Crisp architectural blueprints on a lightbox, precise lines meeting soft shadows"
+- "Velvet dusk in a jazz lounge, brass accents catching amber light"
+- "Fresh linen on a sunlit porch, lavender breeze, weathered wood underfoot"
+- "Polished concrete gallery, single spotlight on brushed steel, deliberate silence"
+**Weak examples (avoid):**
+- "Modern and professional" *(too generic)*
+- "Blue website with cards" *(describes implementation, not feeling)*
+- "Clean and minimal" *(no sensory information)*
+### Step 3: Concept Name
+Generate a unique 2-3 word name that anchors all design decisions. This becomes the reference point for the entire project:
+
+Examples: `Ceramic Warmth` | `Alpine Clarity` | `Brass & Velvet` | `Clinical Precision` | `Coastal Morning` | `Workshop Heritage`
+---
+## DESIGN COMMUNICATION
+### Color Intent
+Choose the approach that matches your PRD information:
+**Option A — Intent-based** *(when PRD has no brand colors):*
+> "Colors should feel like [reference your Visual Anchor]: warm ambers, soft creams, touches of brass"
+**Option B — Specific** *(when PRD provides brand colors):*
+```
+Primary: hsl(35, 80%, 50%) — warm amber
+Secondary: hsl(35, 30%, 95%) — soft cream  
+Accent: hsl(35, 60%, 35%) — deep brass
+```
+**Option C — Hybrid** *(when PRD has partial brand info):*
+> "Primary brand blue: hsl(210, 70%, 45%). Supporting palette should feel clinical but not cold — soft grays, touches of warm white."
+### Typography Intent
+
+**Option A — Specific fonts:**
+> Display: Playfair Display | Body: Source Sans 3
+
+**Option B — Character description:**
+> "Headlines should feel established and trustworthy — perhaps a refined serif. Body text clean and effortless to read."
+**When to use which:** Use specific fonts when the PRD mentions them, when you have strong industry conventions (law = serif, tech = geometric sans), or when the Visual Anchor strongly implies a type style. Use character description when the PRD is open-ended.
+### Animation Character
+Choose ONE word that describes how motion should feel throughout the site:
+- `subtle` — barely perceptible, professional restraint
+- `confident` — purposeful movement, clear intent
+- `gentle` — soft, eased, calming
+- `playful` — bouncy, energetic, delightful
+- `dramatic` — bold entrances, statement-making
+- `minimal` — almost none, content-focused
+
+### Image Direction
+
+Provide enough guidance for AI image generation or stock selection:
+
+```
+Subject: [What images should show — people at work, products in context, environment shots]
+Mood: [Emotional quality — warm, professional, energetic, calm, luxurious]
+Treatment: [Visual treatment — soft edges blending into background, high contrast, muted tones, film grain]
+Composition: [Optional — close-up details, wide environmental, portrait-style]
+```
+---
+## CONTENT HANDLING
+### Core Rules
+
+1. **Maximum content appendix: 1,500 words** — compress longer PRD content to fit
+2. **Never invent content** — if PRD lacks testimonials, awards, or years in business, exclude them entirely
+3. **Preserve all essential information** — compress wording, not meaning
+4. **Shorter PRDs don't need padding** — only include what exists
+5. **Mark inferences clearly** — if you must infer (e.g., standard business hours), note it
+
+### Compression Approach
+Reduce verbose PRD content while preserving meaning. Use structured notation:
+```
+## HEADLINES
+H1: [Exact headline text]
+H2-hero: [Exact subheadline]
+H2-services: [Section headline]
+H2-about: [Section headline]
+## SERVICES
+S1: [Name] | [Core benefit, max 20 words] | [Price if provided]
+S2: [Name] | [Core benefit] | [Price]
+S3: [Name] | [Core benefit] | [Price]
+## ABOUT
+[Company story compressed to 40-60 words, preserving key facts]
+[Team info if provided: names, roles, brief bios]
+## TESTIMONIALS (only if real quotes exist in PRD)
+T1: "[Exact quote, max 30 words]" — [Name], [Role/Company]
+T2: "[Exact quote]" — [Name], [Role]
+## FAQ (if provided)
+Q1: [Question] → [Answer compressed to max 40 words]
+Q2: [Question] → [Answer]
+
+## TRUST SIGNALS (only if real)
+- [Years in business — only if stated]
+- [Certifications — only if stated]
+- [Awards — only if stated]
+- [Client count — only if stated]
+## CONTACT
+Phone: [number]
+Email: [address]
+Address: [full address]
+Hours: [formatted] *[note if inferred from industry standard]*
+
+## CTAs (in priority order)
+CTA1: [Button text] → [Action/destination]
+CTA2: [Button text] → [Action/destination]
+```
+**For content types not listed:** Create logical structured notation that preserves information hierarchy. Be consistent. The AI Coder will interpret any clear structure.
+---
+## PHASE 1 PROMPT STRUCTURE
+
+```markdown
+# [BUSINESS NAME] — Phase 1: Foundation + Content
+## For Lovable.dev
+---
+### Design Concept
+**Concept Name:** [2-3 word unique identifier]
+**Visual Anchor:** "[15-25 word sensory metaphor that captures the entire design feeling]"
+**Spectrum Position:** 
+Luminosity [X]% | Materiality [X]% | Temperature [X]% | Shape [X]%
+---
+
+### Design Intent
+**Colors:** [Intent description referencing Visual Anchor OR specific HSL values]
+**Typography:** [Font names OR character description]
+**Animation Character:** [single word]
+**Image Direction:**
+- Subject: [description]
+- Mood: [description]
+- Treatment: [description]
+---
+### Page Configuration
+**Industry:** [specific business type]
+**Mobile Priority:** [desktop-primary | mobile-primary | balanced]
+**Page Depth:** [compact: 3-4 sections | standard: 5-6 sections | comprehensive: 7+]
+---
+### Section Priority
+1. **[CRITICAL] Hero** — [specific requirements, key message]
+2. **[CRITICAL] Services** — [number of services, display approach]
+3. **[HIGH] Contact** — [what contact methods to emphasize]
+4. **[MEDIUM] About** — [what story to tell]
+5. **[LOW/OPTIONAL] FAQ** — [if included, why]
+---
+### Special Requirements
+[Any unique constraints, must-haves, or specific requests from the PRD]
+[Unusual features or functionality needed]
+[Things to specifically avoid if mentioned in PRD]
+---
+## CONTENT APPENDIX
+[All compressed content using structured notation above]
+[Maximum 1,500 words]
+[Only real content from PRD — never invented]
+
+---
+**Implementation Instruction:**
+Build this landing page as a single-page React application. Reference the Visual Anchor "[Concept Name]" for all aesthetic decisions. The design should feel like: "[repeat the Visual Anchor metaphor]"
+
+```
+
+---
+## TRUST THE AI CODER
+The AI Coder (Lovable.dev) handles these automatically and well. Do NOT specify:
+| ❌ Don't Specify | ✅ Instead Communicate |
+|------------------|------------------------|
+| Exact pixel values, spacing numbers | "Generous whitespace" / "Intimate, cozy spacing" |
+| Animation timings, easing curves | "Confident motion" / "Gentle, subtle movement" |
+| Z-index values, layering details | "Cards should feel elevated, floating above" |
+| Responsive breakpoint specifics | "Mobile-first" or "Desktop-primary" |
+| Icon selections | "Icon representing [purpose]" |
+| Shadow values, blur amounts | "Soft shadow suggesting depth" / "Grounded, minimal shadow" |
+| Grid column counts, flexbox code | "Magazine-style layout" / "Card grid" |
+| Hex codes, RGB values | HSL values or color intent descriptions |
+**The principle:** Describe the *feeling* and *intent*. Trust implementation details to the AI Coder.
+---
+## PRE-OUTPUT VERIFICATION
+Before outputting Phase 1, verify internally:
+### Design Communication
+- [ ] Visual Anchor is a rich sensory metaphor (15-25 words, not generic)
+- [ ] Four-spectrum values assigned and consistent with metaphor
+- [ ] Animation character is ONE word that fits the concept
+- [ ] Color intent is clear and matches Visual Anchor mood
+
+### Content Integrity  
+- [ ] ALL content comes directly from PRD
+- [ ] NO invented testimonials, awards, statistics, or years in business
+- [ ] Content appendix ≤ 1,500 words
+- [ ] Headlines preserved exactly, not paraphrased
+- [ ] Inferences marked clearly where made
+### Structure
+- [ ] Sections prioritized with CRITICAL/HIGH/MEDIUM/LOW
+- [ ] Mobile priority specified based on industry/audience
+- [ ] Page depth matches PRD scope (don't add sections for content that doesn't exist)
+
+### Phase 2 Readiness
+- [ ] Visual Anchor can be referenced consistently in Phase 2
+- [ ] No implementation details specified that would conflict with polish phase
+- [ ] Premium enhancements identified internally for Phase 2 generation
+
+---
 
 
-      await new Promise(r => setTimeout(r, 2000));
+## QUICK REFERENCE
 
-      const input = document.querySelector('textarea#chatinput');
+| Decision | Communicate | Don't Specify |
+|----------|-------------|---------------|
+| Colors | "Warm amber tones" or HSL | Hex codes, RGB, specific Tailwind classes |
+| Spacing | "Generous", "Intimate", "Breathing room" | px, rem, gap-4, specific values |
+| Animation | "Confident", "Subtle", "Gentle" | Durations, easing functions, keyframes |
+| Layout | "Magazine-style", "Cards feel elevated" | Grid columns, flexbox properties |
+| Typography | Font names or "Trustworthy, refined" | Font sizes, line heights, weights |
+| Shadows | "Elevated", "Floating", "Grounded" | Shadow-lg, blur values, opacity |
+| Images | "Soft edges into background" | Specific gradients, mask code |
 
-      if (!input) return { error: 'No input found' };
+---
 
+## EXECUTION
 
+**Based on the PRD from this Chat:**
+
+1. Complete the Reasoning Protocol internally
+2. Synthesize the Visual Concept (spectrum + metaphor + name)
+3. Determine design communication approach based on PRD completeness
+4. Compress all content preserving meaning and authenticity
+5. Verify against Pre-Output checklist
+6. Output Phase 1 prompt only
+7. Await user request for Phase 2
+
+**Output Phase 1 immediately. Make informed inferences for industry conventions. Never invent business facts. Trust the AI Coder to implement your vision brilliantly.**
+
+---
+
+Optimized for AI Prompter → AI Coder communication
+*Phase 1 target: 2,300-2,900 words | Phase 2 target: 900-1,300 words | Content appendix max: 1,500 words*
+
+---`;
+
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input' };
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
       input.focus();
-
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const nativeInputValueSetter =
-      Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype,
-      'value').set;
-
-      nativeInputValueSetter.call(input, text);
-
-
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-
-
       await new Promise(r => setTimeout(r, 500));
-
-
-      const currentValue = input.value;
-
-      console.log('Value after paste:', currentValue.substring(0, 100));
-
-
-      return { success: true, length: currentValue.length, matches: currentValue
-      === text };
-    args: phase1Prompt
-    param: lovablePaste1
-  - type: wait
-    timeout: 2000
-    for: idle
-  - type: say
-    message: Submitting Phase 1
+      setReactValue(input, prompt);
+      return { success: true, length: prompt.length };
+    param: perplexityPrompt3
   - type: js
-    code: >
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      const btn =
-      document.querySelector('button#chatinput-send-message-button');
-
-      if (!btn) {
-        console.log('No button found');
-        return { error: 'No button' };
+    code: |
+      const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
       }
-
-
-      if (btn.disabled) {
-        console.log('Button is disabled');
-        return { error: 'Button disabled' };
-      }
-
-
-      console.log('Clicking send button');
-
-      btn.click();
-
-
-      await new Promise(r => setTimeout(r, 1000));
-
-
-      return { success: true };
-    param: lovableSubmit1
-  - type: say
-    message: Waiting for Phase 1 generation
+      return { error: 'No send' };
+    param: perplexitySend3
   - type: js
     code: |
       const maxWait = 600;
       let waited = 0;
-      const checkInterval = 3;
-
-      console.log('Starting wait for Lovable Phase 1 completion...');
-
       while (waited < maxWait) {
-        await new Promise(r => setTimeout(r, checkInterval * 1000));
-        waited += checkInterval;
-        
-        const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
-        
-        const textarea = document.querySelector('textarea#chatinput');
-        const button = document.querySelector('button#chatinput-send-message-button');
-        
-        const textareaReady = textarea && !textarea.disabled;
-        const buttonExists = !!button;
-        const generationComplete = !!thumbsUpButton;
-        
-        if (generationComplete && textareaReady && buttonExists) {
-          console.log('Lovable Phase 1 complete at', waited, 'seconds');
-          console.log('Thumbs up button found:', generationComplete);
-          console.log('Textarea ready:', textareaReady);
-          return { finished: true, waitedSeconds: waited };
-        }
-        
-        if (waited % 15 === 0) {
-          console.log('Still generating...', waited, 'seconds elapsed');
-          console.log('Thumbs up visible:', generationComplete);
-          console.log('Textarea ready:', textareaReady);
-        }
-      }
-      return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: lovableWait1
-  - type: say
-    message: Phase 1 complete
-  - type: wait
-    timeout: 5000
-    for: idle
-  - type: say
-    message: Pasting Phase 2
+        await new Promise(r => setTimeout(r, 3000));
+        waited += 3;
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const textarea = document.querySelector('textarea#chatinput, textarea');
+        if (!stop && textarea) return { finished: true, waitedSeconds: waited };
+    param: perplexityWait3
+    code: |
+      const latestMessage = Array.from(
+        document.querySelectorAll('[data-message-author-role="assistant"], article')
+      ).filter((el) => window.getComputedStyle(el).display !== 'none').pop();
+      let copiedText = '';
+      if (latestMessage) copiedText = latestMessage.innerText || latestMessage.textContent || '';
+      return { copiedText, length: copiedText.length };
+    param: frameworkOutput
+
+  # 7) Phase 2 trigger prompt in Perplexity
+    message: Submitting Phase 2 trigger prompt to Perplexity
+      const prompt = `# PHASE 2 TRIGGER PROMPT
+---
+## Generate Phase 2: Premium Polish
+You previously generated a Phase 1 prompt for the Business from the PRD using the your design concept. The user has reviewed the implementation and is ready for the premium polish phase.
+
+### Your Task
+Generate the Phase 2 prompt that elevates the existing implementation. Phase 2 focuses on:
+
+**Interaction & Motion**
+- Enhanced hover states (micro-interactions that feel alive)
+- Scroll-triggered animations (elements revealing with purpose)
+- State transitions (smooth, intentional feedback)
+**Visual Depth**
+- Layering and dimensional effects
+- Background visual interest (subtle patterns, gradients, atmospheric elements)  
+- Image integration refinements (soft edges, blending, contextual placement)
+
+**Delightful Details**
+- Moments of unexpected polish that elevate perception
+- Details that make the site feel crafted, not templated
+- Small touches aligned with the Visual Anchor mood
+### Phase 2 Rules
+1. **Reference, don't redefine** — Use the existing Concept Name and Visual Anchor. Don't re-explain the design system.
+
+2. **Enhance, don't rebuild** — No structural changes, no new sections, no content changes.
+
+3. **Specific but not prescriptive** — Describe what interactions should *feel like*, not exact implementation code.
+4. **Prioritize impact** — Focus on 3-5 high-impact enhancements rather than exhaustive lists.
+5. **Stay on-brand** — All enhancements must feel consistent with the Visual Anchor metaphor.
+### Phase 2 Output Format
+```markdown
+# [BUSINESS NAME] — Phase 2: Premium Polish
+## Enhancing "[Concept Name]"
+### Interaction Enhancements
+[2-3 specific interaction improvements with intent descriptions]
+### Motion Refinements  
+[2-3 animation enhancements that add life and purpose]
+### Visual Depth Additions
+[1-2 layering or atmospheric enhancements]
+
+### Detail Polish
+[1-2 small delightful touches]
+---
+Refine the existing implementation with these enhancements. 
+Maintain the "[Visual Anchor metaphor]" feeling throughout.
+Do not change structure or content — only elevate the craft.
+```
+### Anti-Patterns (Avoid)
+- ❌ Repeating any content from Phase 1
+- ❌ Suggesting structural changes or new sections
+- ❌ Specifying exact CSS values or animation timings
+- ❌ Generic requests ("make it more modern")
+- ❌ Changes that contradict the Visual Anchor mood
+**Generate the Phase 2 prompt now, building on the established Design foundation established in Phase 1.**`;
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input' };
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      input.focus();
+      await new Promise(r => setTimeout(r, 500));
+      setReactValue(input, prompt);
+      return { success: true, length: prompt.length };
+    param: perplexityPrompt4
   - type: js
-    code: >
-      const text = args.phase2Prompt;
+    code: |
+      const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
+      return { error: 'No send' };
+    param: perplexitySend4
+        await new Promise(r => setTimeout(r, 3000));
+        waited += 3;
+        const stop = document.querySelector('button[aria-label*="Stop"]');
+        const textarea = document.querySelector('textarea#chatinput, textarea');
+        if (!stop && textarea) return { finished: true, waitedSeconds: waited };
+    param: perplexityWait4
+  - type: js
+    code: |
+      const latestMessage = Array.from(
+        document.querySelectorAll('[data-message-author-role="assistant"], article')
+      ).filter((el) => window.getComputedStyle(el).display !== 'none').pop();
+      let copiedText = '';
+      if (latestMessage) copiedText = latestMessage.innerText || latestMessage.textContent || '';
+      return { copiedText, length: copiedText.length };
+    param: phase2Output
 
-      console.log('Phase 2 length:', text.length);
+  # 8) Open Lovable.dev and submit framework output
+    message: Opening Lovable.dev and submitting Phase 1 prompt
+  - type: navigate
+    url: https://lovable.dev/
+    waitForIdle: true
+    timeout: 8000
+    code: |
+      const text = (args.frameworkOutput && args.frameworkOutput.copiedText) || '';
+      const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      setReactValue(input, text);
+      return { success: Boolean(text), length: text.length };
+    args: frameworkOutput
+    param: lovablePaste1
+    code: |
+      const btn = document.querySelector('button#chatinput-send-message-button, button[aria-label*="Send"], form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
+      }
+      return { error: 'No send' };
+    param: lovableSend1
+      const checkInterval = 5;
+        if (thumbsUpButton && textarea) return { finished: true, waitedSeconds: waited };
+    param: lovableWait1
 
+  # 9) Submit Phase 2 prompt in Lovable
+    message: Submitting Phase 2 prompt in Lovable
+      const text = (args.phase2Output && args.phase2Output.copiedText) || '';
+      const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      setReactValue(input, text);
+    args: phase2Output
+    param: lovablePaste2
+      const btn = document.querySelector('button#chatinput-send-message-button, button[aria-label*="Send"], form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      const input = document.querySelector('textarea#chatinput, textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
+      }
+      return { error: 'No send' };
+    param: lovableSend2
+      const checkInterval = 5;
+        const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
+        if (thumbsUpButton && textarea) return { finished: true, waitedSeconds: waited };
+      return { finished: false, timedOut: true, waitedSeconds: waited };
+    param: lovableWait2
+    code: |
+      return { url: window.location.href };
+    param: lovableEditorUrl
+  # 10) Post Lovable editor URL back to Perplexity chat
+    message: Returning Lovable editor URL to Perplexity
+    url: "{{perplexityChatUrl.url}}"
+    code: |
+      const text = `Lovable editor URL: ${args.lovableEditorUrl && args.lovableEditorUrl.url ? args.lovableEditorUrl.url : window.location.href}`;
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (!input) return { error: 'No input' };
+      const setReactValue = (el, value) => {
+        const desc = Object.getOwnPropertyDescriptor(el.__proto__, 'value');
+        const setter = desc && desc.set;
+        if (setter) setter.call(el, value); else el.value = value;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      };
+      setReactValue(input, text);
+      return { success: true, textLength: text.length };
+    args:
+      lovableEditorUrl: lovableEditorUrl
+    param: perplexityReturnUrl
+    code: |
+      const btn = document.querySelector('button[aria-label*="Send"], button#chat-submit, form button');
+      if (btn && !btn.disabled) { btn.click(); return { success: true } }
+      const input = document.querySelector('textarea, [contenteditable="true"], div[role="textbox"]');
+      if (input) {
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true }));
+        return { success: true, method: 'enter' };
+      return { error: 'No send' };
+    param: perplexitySendUrl
+    message: Pasting ChatGPT image prompt into Lovable
+  - type: js
+    code: |
+      const text = (args.chatgptOutput && args.chatgptOutput.copiedText) || '';
 
       await new Promise(r => setTimeout(r, 2000));
 
@@ -1102,41 +1379,33 @@ steps:
 
       if (!input) return { error: 'No input found' };
 
-
       input.focus();
 
       await new Promise(r => setTimeout(r, 1000));
 
-
       const nativeInputValueSetter =
-      Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype,
-      'value').set;
+        Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
 
       nativeInputValueSetter.call(input, text);
 
-
       input.dispatchEvent(new Event('input', { bubbles: true }));
-
       input.dispatchEvent(new Event('change', { bubbles: true }));
-
 
       await new Promise(r => setTimeout(r, 500));
 
-
-      return { success: true, length: input.value.length };
-    args: phase2Prompt
-    param: lovablePaste2
+      return { success: Boolean(text), length: text.length };
+    args: chatgptOutput
+    param: lovablePasteChatgpt
   - type: wait
     timeout: 2000
     for: idle
   - type: say
-    message: Submitting Phase 2
+    message: Submitting ChatGPT image prompt
   - type: js
-    code: >
+    code: |
       await new Promise(r => setTimeout(r, 1000));
 
-      const btn =
-      document.querySelector('button#chatinput-send-message-button');
+      const btn = document.querySelector('button#chatinput-send-message-button');
 
       if (!btn || btn.disabled) return { error: 'Button not ready' };
 
@@ -1145,45 +1414,44 @@ steps:
       await new Promise(r => setTimeout(r, 1000));
 
       return { success: true };
-    param: lovableSubmit2
+    param: lovableSubmit3
   - type: say
-    message: Waiting for Phase 2 generation
+    message: Waiting for ChatGPT prompt generation
   - type: js
     code: |
       const maxWait = 600;
       let waited = 0;
       const checkInterval = 3;
-
-      console.log('Starting wait for Lovable Phase 2 completion...');
+      let generationStarted = false;
 
       while (waited < maxWait) {
         await new Promise(r => setTimeout(r, checkInterval * 1000));
         waited += checkInterval;
-        
-        const thumbsUpButton = document.querySelector('svg.shrink-0.h-4.w-4[fill="currentColor"]');
+
+        const stopBtn = document.querySelector('button[aria-label*="Stop"]');
         const textarea = document.querySelector('textarea#chatinput');
         const button = document.querySelector('button#chatinput-send-message-button');
-        
+
         const textareaReady = textarea && !textarea.disabled;
         const buttonExists = !!button;
-        const generationComplete = !!thumbsUpButton;
-        
-        if (generationComplete && textareaReady && buttonExists) {
-          console.log('Phase 2 complete at', waited, 'seconds');
-          return { finished: true, waitedSeconds: waited };
+        const buttonDisabled = button && button.disabled;
+
+        if (stopBtn || buttonDisabled) {
+          generationStarted = true;
         }
-        
+
+        if (generationStarted && !stopBtn && textareaReady && buttonExists && !buttonDisabled) {
+          return { finished: true, waitedSeconds: waited, generationStarted };
+        }
+
         if (waited % 15 === 0) {
-          console.log('Still generating Phase 2...', waited, 'seconds');
-          console.log('Thumbs up visible:', generationComplete);
+          console.log('Still generating ChatGPT prompt...', waited, 'seconds');
         }
       }
-      return { finished: false, timedOut: true, waitedSeconds: waited };
-    param: lovableWait2
-  - type: say
-    message: Phase 2 complete
+      return { finished: false, timedOut: true, waitedSeconds: waited, generationStarted };
+    param: lovableWait3
   - type: wait
-    timeout: 3000
+    timeout: 2000
     for: idle
   - type: say
     message: Extracting links
